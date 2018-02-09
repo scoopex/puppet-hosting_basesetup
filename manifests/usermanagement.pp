@@ -15,6 +15,7 @@ class hosting_basesetup::usermanagement (
     owner   => 'root',
     group   => 'root',
     mode    => '0755',
+    backup  => false,
     recurse => true,
     purge   => true,
   }

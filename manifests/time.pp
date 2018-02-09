@@ -10,10 +10,7 @@ class hosting_basesetup::time (Array[String] $ntp_servers,) {
 
   # rng-tools (entropy gatherer)
   if $::is_virtual {
-    ensure_packages(['rng-tools'], {
-      ensure => present
-    }
-    )
+    ensure_packages(['rng-tools'], { ensure => present })
 
     file { '/etc/default/rng-tools':
       ensure  => present,

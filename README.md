@@ -52,13 +52,37 @@ Things implemented with this setup
   https://forge.puppet.com/puppet/unattended_upgrades
 * at/cron setup
 * ulimits
-  
+* grub config</BR>
+  (no splash, no quiet mode)
+
+
 Currently not implemented/TODOs
 --------------------------------
 
 by priority:
 
-* reduce dprecation warnings of used modules
+* SMART Daemon on non virtualized hardware systems
+* systemd journal configuration (housekeeping, permissions)
+  https://www.freedesktop.org/software/systemd/man/journald.conf.html
+  /etc/systemd/journald.conf
+* blockdevice parameters<BR>
+  (Scheduler, Readahead, ...)
+  udevadm info -a -p /sys/block/sda
+  https://unix.stackexchange.com/questions/71364/persistent-blockdev-setra-read-ahead-setting
+* virtual serial consoles for server systems
+  => to support connect by virtual serial console by IPMI
+* IPTables base setup for ipv4/ipv6, https://github.com/puppetlabs/puppetlabs-firewall
+  * restrict for inbound everything except ssh
+  * restrict outbound except essential os parameters
+  * use groups of systems
+* (default) filesystemparameters
+* configure network interfaces
+* IPMI Watchdog
+* configure lvm volumes, groups
+* network tuning
+  (Port Ranges, Socket Buffers, tcp_sack, tcp_timestamps )
+* reduce deprecation warnings of used modules
+* sepcify exact versions for dependencies
 * use hiera data in module for distibution specific parameters
 * use testinfra as testing framework
   https://testinfra.readthedocs.io/en/latest/

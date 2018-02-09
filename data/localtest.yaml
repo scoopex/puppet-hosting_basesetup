@@ -53,4 +53,3 @@ hosting_basesetup::users:
       - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCf8jizyqebUQ2hXJF5tWUz3eev+uE1liHZ7bMK4pp5nlaxkNq81dOLA9TZDbF6b+LFKKPxHUME5QypcDltaan83dN5tM+VJKz5K8qam9j8RpOm7gpKkomjXSTAMmhelZMLpOwhap77QVJo4EaKLqlkdRGh4o/dBnCOgkrZVjZ0TVG+u7BtGuQtbYvTBEL/Uu3HwWh4bGt5eFqyREgs6PE7u4bSnkyp6N/lrRqArefI0g2soNzOboxW2ONkAP6epNCRDDPp0erWJ1TU1VPLG72r2nupb7bdtTcDklGQMOWMWFvLzCkpD+LJDqh344gux1R45ikQqaL61ZqoV3Pt6t3xJ foo@bar.de"
     group_primary: 'devteam'
     ensure: present
-

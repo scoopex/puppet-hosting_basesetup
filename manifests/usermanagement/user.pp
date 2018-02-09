@@ -37,6 +37,7 @@ define hosting_basesetup::usermanagement::user (
     owner   => $username,
     group   => $group_primary,
     mode    => '0600',
+    backup  => false,
     content => template("hosting_basesetup/authorized_keys.erb"),
   }
 
@@ -46,6 +47,7 @@ define hosting_basesetup::usermanagement::user (
     owner   => $username,
     group   => $group_primary,
     source  => $dotfile_sourcedir,
+    backup  => false,
     require => User[$username],
     recurse => true,
   }

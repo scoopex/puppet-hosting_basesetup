@@ -18,6 +18,7 @@ file { "/etc/sudoers.d/vagrant":
   group   => 'root',
   mode    => '0644',
   content => "
+vagrant ALL=(ALL) NOPASSWD:ALL
 ubuntu ALL=(ALL) NOPASSWD: ALL
 debian ALL=(ALL) NOPASSWD: ALL
 centos ALL=(ALL) NOPASSWD: ALL

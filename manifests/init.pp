@@ -68,10 +68,31 @@ class hosting_basesetup (
   }
 
   ## SSH #################################################################################
-  class{'::ssh_hardening::server':
-    use_pam => true,
+  # TODO: create secure client settings
+  class{'::ssh':
+    ssh_config_forward_agent => 'no',
+    sshd_config_permitemptypasswords => 'no',
+    sshd_password_authentication => 'no',
+    sshd_allow_tcp_forwarding => 'no',
+    sshd_x11_forwarding => 'no',
+    sshd_config_use_dns => 'no',
+    sshd_config_challenge_resp_auth => 'no',
+    sshd_use_pam  => 'yes',
+    sshd_config_ciphers => [ 'aes256-ctr','aes192-ctr','aes128-ctr' ],
+    sshd_ignoreuserknownhosts => 'yes',
+    sshd_kerberos_authentication => 'no',
+    sshd_config_kexalgorithms => [ 'diffie-hellman-group-exchange-sha256' ],
+    sshd_config_loglevel => 'VERBOSE', 
+    sshd_config_login_grace_time => '30s',
+    sshd_config_macs => [ 'hmac-sha2-512', 'hmac-sha2-256', 'hmac-ripemd160'],
+    sshd_config_maxauthtries => 2,
+    sshd_config_maxsessions => 10,
+    sshd_config_maxstartups => '10:30:100',
+    sshd_config_strictmodes => 'yes',
+    sshd_config_use_privilege_separation => 'sandbox',
+    sshd_config_print_motd => false,
+    permit_root_login => 'without-password',
   }
-  include ::ssh_hardening::client
 
   if $mosh {
     ensure_packages(['mosh',], {

@@ -1,6 +1,7 @@
 *.lock
 .tmp
 *.swp
+*.idea
 .kitchen/
 .librarian/
 
