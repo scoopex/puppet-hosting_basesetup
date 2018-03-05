@@ -50,7 +50,7 @@ set tabpagemax=30
 
 " enable syntax highlighting
 syntax on
-
+color delek
 
 """
 """ ATTENTION: THIS FILE IS MANAGED BY PUPPET

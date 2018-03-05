@@ -39,6 +39,7 @@ Things implemented with this setup
   * distribution of ssh keys
   * distribution of standard dotfiles
   * distribution of user specific dotfiles from a specifyable location
+  * minimal numeric uids/gids at 12000 to reduce collections with groups and users id without numeric id specification
 * installation of zabbix agent
   * add additional zabbix-agent-extenion packages
 * package installtion via hiera
@@ -60,6 +61,29 @@ Currently not implemented/TODOs
 --------------------------------
 
 by priority:
+
+* Disk Device Settings (Cassandra)
+  * Configure readahead for ssds/disks
+    ```
+    echo 8 > /sys/class/block/sda/queue/read_ahead_kb
+    blockdev --setra 128
+    ```
+  * Configure Scheduler (Cassandra)
+    ```
+    echo deadline > /sys/block/sda/queue/scheduler
+    ```
+  * Rotational (Cassandra)
+    ```
+    echo 0 > /sys/class/block/sda/queue/rotational
+    ```
+* zone_reclaim_mode on NUMA systems (Cassandra)
+  ```
+    echo 0 > /proc/sys/vm/zone_reclaim_mode
+  ```
+* Hugepage defrag (Cassandra)
+  ```
+  echo never | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
+  ```
 
 * SMART Daemon on non virtualized hardware systems
 * systemd journal configuration (housekeeping, permissions)

@@ -29,9 +29,9 @@ defutf8 on
 # Disable welcome message
 startup_message off
 
-# Den CommandKey von STRG+a auf STRG+y verlegen
-# (wegen STRG+a und STRG+e in der Bash)
-escape ^yy
+# # Den CommandKey von STRG+a auf STRG+y verlegen
+# # (wegen STRG+a und STRG+e in der Bash)
+# escape ^yy
 
 
 # smart caption line

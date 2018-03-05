@@ -46,6 +46,12 @@ platforms:
       #- ['private_network', {ip: '192.168.33.34'}]
       #- ["forwarded_port", {guest: 8080, host: 8080}]
       #
+  - name: debian-jessie-virtualbox-puppet5-hosting_basesetup
+    driver_plugin: vagrant
+    driver:
+      vagrantfile_erb: vagrantfiles/Vagrantfile-debianoid.erb
+      box: debian/contrib-jessie64
+      box_url: https://app.vagrantup.com/debian/boxes/contrib-jessie64
   - name: centos7-virtualbox-puppet5-hosting_basesetup
     driver_plugin: vagrant
     driver:

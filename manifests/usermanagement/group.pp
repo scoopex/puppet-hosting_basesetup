@@ -7,6 +7,7 @@ define hosting_basesetup::usermanagement::group (
   group { $groupname:
     ensure => $ensure,
     gid    => $gid,
+    require => File_Line['min_gid'],
   }
 
   if $sudo_template != "" {
