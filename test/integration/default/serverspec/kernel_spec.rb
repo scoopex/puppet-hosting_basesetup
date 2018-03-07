@@ -35,5 +35,8 @@ describe command('ulimit -n') do
    its(:stdout) { should match(/8192/) }
 end
 
+describe command('cat /sys/kernel/mm/transparent_hugepage/defrag') do
+   its(:stdout) { should match(/\[never\]/) }
+end
 #----------------------------------------------------------------------
 

@@ -4,6 +4,16 @@ hosting_basesetup::mail_domain: foobar.de
 hosting_basesetup::rootpwhash: '$1$Etg2ExUZ$F9NTP7omafhKIlqaBMqng1'
 hosting_basesetup::mosh: true
 hosting_basesetup::kernel::sysctl_enable_fastnetworking_defaults: true
+
+# Useful for ssd devices
+hosting_basesetup::kernel::sysfs::items:
+  sda:
+    base: "class/block/sda/"
+    sysfs_config:
+      "queue/read_ahead_kb": "8"
+      "queue/scheduler": "deadline"
+      "queue/rotational": "0"
+
 hosting_basesetup::monitoring::additional_agent_packages: 
   - 'curl'
 hosting_basesetup::usermanagement::restriction_tag: 'bigdata'

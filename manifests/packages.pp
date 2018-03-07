@@ -38,10 +38,12 @@ class hosting_basesetup::packages (
 
   case $::operatingsystem {
     'ubuntu', 'debian': {
-      exec { 'update-alternatives --set editor /usr/bin/vim.basic':
-        path    => '/bin:/sbin:/usr/bin:/usr/sbin',
-        unless  => 'test /etc/alternatives/editor -ef /usr/bin/vim.basic',
-        require => Package['vim'],
+      if defined(Package['vim']) {
+        exec { 'update-alternatives --set editor /usr/bin/vim.basic':
+          path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+          unless  => 'test /etc/alternatives/editor -ef /usr/bin/vim.basic',
+          require => Package['vim'],
+        }
       }
     }
   }
