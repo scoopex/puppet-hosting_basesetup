@@ -1,4 +1,6 @@
-class hosting_basesetup::kernel::parameters () {
+class hosting_basesetup::kernel::parameters (
+  String $options = $::hosting_basesetup::kernel::grub_options
+) {
 
   #if $::is_virtual {}
   # GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS0"
@@ -6,7 +8,7 @@ class hosting_basesetup::kernel::parameters () {
     'ubuntu', 'debian' : {
         augeas{ 'set_kernel_opts':
           context =>  '/files/etc/default/grub',
-          changes =>  "set GRUB_CMDLINE_LINUX_DEFAULT '\"${hosting_basesetup::kernel::boot_options}\"'",
+          changes =>  "set GRUB_CMDLINE_LINUX_DEFAULT '\"${options}\"'",
           notify => Exec['update-grub']
         }
         exec { "update-grub":

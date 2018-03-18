@@ -63,7 +63,7 @@ define hosting_basesetup::usermanagement::user (
         source  => $dotfile_sourcedir,
         backup  => false,
         require => User[$username],
-        recurse => true,
+        recurse => remote,
       }
     }
   }else{

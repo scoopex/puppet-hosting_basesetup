@@ -25,7 +25,7 @@
 # mode power/state = 0660
 # owner power/state = root:power
 
-<% @sysfs_config_final.each do |key, value| -%>
+<% @config_final.each do |key, value| -%>
 <%= key %> = <%= value %>
 <% end -%>
 

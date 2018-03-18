@@ -2,10 +2,24 @@
 ####
 #### FILE CREATED BY PUPPET, DO NOT EDIT
 
+<%
+def remove_dup_slashes(value)
+    value = value.gsub(/\/+/, "/")
+    return value
+end
+%>
 
-<% @sysfs_config.each do |key, value| -%>
-<%= @prefix_final %><%= @base %>/<%= key %> = <%= value %>
-<% end -%>
+<%
+@base_arr_final.each do |base_item|
+   @config.each do |key, value|
+     item = remove_dup_slashes(base_item + "/" + key)
+     out = sprintf("%s%s = %s",@prefix_final, item, value)
+-%>
+<%= out %>
+<%
+   end
+end
+-%>
 
 ####
 #### FILE CREATED BY PUPPET, DO NOT EDIT

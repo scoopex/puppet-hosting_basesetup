@@ -54,7 +54,6 @@ end
 
 describe command('ntpq -c peers') do
   its(:stdout) { should match(/^\*/) }
-  its(:stdout) { should match(/^\+/) }
 end
 
 describe command('rngtest -c 100 </dev/urandom') do

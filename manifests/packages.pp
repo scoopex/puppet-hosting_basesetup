@@ -11,6 +11,10 @@ class hosting_basesetup::packages (
         'xfsprogs', 'zip', 'git', 'tig', 'vim', 'finger', 'mailutils', 'traceroute',
         'net-tools', 'lvm2', 'strace', 'sysfsutils'
       ]
+      if (!$::is_virtual) {
+        ensure_packages(['smartmontools'], { ensure => present })
+      }
+
     }
     'Centos': {
       $packages = [
@@ -19,6 +23,9 @@ class hosting_basesetup::packages (
         'sysfsutils'
       ]
       # 'iftop', 'ncdu', 'scsitools', 'pv', 'tig', 'mailutils', 'htop',
+      if(!$::is_virtual) {
+        ensure_packages(['smartmontools'], { ensure => present })
+      }
     }
     default: {
       fail("unsupported os: ${::operatingsystem}")

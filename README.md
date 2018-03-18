@@ -66,9 +66,8 @@ Currently not implemented/TODOs
 
 by priority:
 
-
-
-* Timed FStrim for Non-Rotational devices   
+* Timed FStrim for Non-Rotational devices</br>
+  (already in place on ubuntu systems)
 * SMART Daemon on non virtualized hardware systems
 * systemd journal configuration (housekeeping, permissions)
   https://www.freedesktop.org/software/systemd/man/journald.conf.html
@@ -82,8 +81,7 @@ by priority:
 * (default) filesystemparameters
 * configure network interfaces
 * IPMI Watchdog
-* configure lvm volumes, groups
-* network tuning
+* enhanced network tuning
   (Port Ranges, Socket Buffers, tcp_sack, tcp_timestamps )
 * reduce deprecation warnings of used modules
 * specify exact versions for dependencies

@@ -23,7 +23,8 @@ busser:
   ruby_bindir: /usr/bin
 
 platforms:
-  - name: ubuntu-16.04-hosting_basesetup
+  #- name: ubuntu-16.04-hosting_basesetup
+  - name: ubuntu-hosting_basesetup
     driver_plugin: vagrant
     driver:
       vagrantfile_erb: vagrantfiles/Vagrantfile-debianoid.erb
@@ -36,7 +37,7 @@ platforms:
       #network:
       #- ['private_network', {ip: '192.168.33.33'}]
       #- ["forwarded_port", {guest: 8080, host: 8080}]
-  - name: debian-stretch-hosting_basesetup
+  - name: debian-hosting_basesetup
     driver_plugin: vagrant
     driver:
       vagrantfile_erb: vagrantfiles/Vagrantfile-debianoid.erb
@@ -46,18 +47,12 @@ platforms:
       #- ['private_network', {ip: '192.168.33.34'}]
       #- ["forwarded_port", {guest: 8080, host: 8080}]
       #
-  - name: debian-jessie-hosting_basesetup
-    driver_plugin: vagrant
-    driver:
-      vagrantfile_erb: vagrantfiles/Vagrantfile-debianoid.erb
-      box: debian/contrib-jessie64
-      box_url: https://app.vagrantup.com/debian/boxes/contrib-jessie64
-  - name: centos7-vbox-hosting_basesetup
+  - name: centos7-hosting_basesetup
     driver_plugin: vagrant
     driver:
       vagrantfile_erb: vagrantfiles/Vagrantfile-centos.erb
       box: centos/7
       box_url: https://app.vagrantup.com/centos/boxes/7
 suites:
-  - name: def
+  - name: default
 

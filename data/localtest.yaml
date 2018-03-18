@@ -4,12 +4,15 @@ hosting_basesetup::mail_domain: foobar.de
 hosting_basesetup::rootpwhash: '$1$Etg2ExUZ$F9NTP7omafhKIlqaBMqng1'
 hosting_basesetup::mosh: true
 hosting_basesetup::kernel::sysctl_enable_fastnetworking_defaults: true
+hosting_basesetup::kernel::grub_options: "foobarbaz=111"
 
-# Useful for ssd devices
-hosting_basesetup::kernel::sysfs::items:
-  sda:
-    base: "class/block/sda/"
-    sysfs_config:
+# Per device settings, especially useful for ssd devices
+hosting_basesetup::kernel::sysfs::config_items:
+  ssds:
+    base:
+      - "class/block/sda/"
+      - "class/block/sdb/"
+    config:
       "queue/read_ahead_kb": "8"
       "queue/scheduler": "deadline"
       "queue/rotational": "0"

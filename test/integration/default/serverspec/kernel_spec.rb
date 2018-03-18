@@ -38,5 +38,22 @@ end
 describe command('cat /sys/kernel/mm/transparent_hugepage/defrag') do
    its(:stdout) { should match(/\[never\]/) }
 end
+
+describe command('cat /sys/class/block/sda//queue/read_ahead_kb') do
+   its(:stdout) { should match(/^8$/) }
+end
+
+describe command('cat /etc/default/grub') do
+   its(:stdout) { should match(/foobarbaz/) }
+end
+
+describe command('/etc/init.d/sysfsutils restart') do
+  its(:exit_status) { should eq 0 }
+end
+
+describe command('sysctl -p') do
+  its(:exit_status) { should eq 0 }
+end
+
 #----------------------------------------------------------------------
 

@@ -1,8 +1,8 @@
 
 define hosting_basesetup::kernel::sysfs_item(
   String $type = "",
-  String $base,
-  Hash $sysfs_config,
+  NotUndef $base,
+  Hash $config,
 ) {
 
 
@@ -15,6 +15,8 @@ define hosting_basesetup::kernel::sysfs_item(
   }else{
     $prefix_final = ""
   }
+
+  $base_arr_final = unique(any2array($base))
 
   case $::operatingsystem {
     'ubuntu', 'debian': {
