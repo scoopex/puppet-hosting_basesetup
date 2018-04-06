@@ -9,7 +9,7 @@ class hosting_basesetup::packages (
         'apt-transport-https', 'bash-completion', 'curl', 'wget', 'htop', 'iftop',
         'iptraf-ng', 'pv', 'lsscsi', 'dialog', 'ncdu', 'scsitools', 'sysstat', 'xfsdump',
         'xfsprogs', 'zip', 'git', 'tig', 'vim', 'finger', 'mailutils', 'traceroute',
-        'net-tools', 'lvm2', 'strace', 'sysfsutils'
+        'net-tools', 'lvm2', 'strace', 'sysfsutils', 'screen'
       ]
       if (!$::is_virtual) {
         ensure_packages(['smartmontools'], { ensure => present })
@@ -20,7 +20,7 @@ class hosting_basesetup::packages (
       $packages = [
         'curl', 'wget', 'iptraf-ng', 'lsscsi', 'sysstat', 'xfsdump', 'xfsprogs', 'zip',
         'git-all', 'vim-enhanced', 'finger', 'traceroute', 'net-tools', 'lvm2', 'strace',
-        'sysfsutils'
+        'sysfsutils', 'screen'
       ]
       # 'iftop', 'ncdu', 'scsitools', 'pv', 'tig', 'mailutils', 'htop',
       if(!$::is_virtual) {

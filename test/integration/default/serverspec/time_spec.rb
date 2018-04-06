@@ -60,5 +60,8 @@ describe command('rngtest -c 100 </dev/urandom') do
   its(:exit_status) { should eq 0 }
 end
 
+describe command('cat /etc/ntp.conf') do
+  its(:stdout) { should match(/10.10.10./) }
+end
 #----------------------------------------------------------------------
 

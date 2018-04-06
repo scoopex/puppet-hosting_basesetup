@@ -49,6 +49,9 @@ describe command('id root') do
    its(:stdout) { should match(/uid=0\(root\) gid=0\(root\) groups=0\(root\)/)}
 end
 
+describe command('su -c "sudo -l" - user1') do
+   its(:stdout) { should match(/NOPASSWD: ALL/)}
+end
 
 #----------------------------------------------------------------------
 

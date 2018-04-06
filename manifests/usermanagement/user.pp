@@ -11,7 +11,7 @@ define hosting_basesetup::usermanagement::user (
   String $passwordhash            = '*',
   String $mail                    = 'Mailadress not specified',
   String $shell                   = '/bin/bash',
-  String $dotfile_sourcedir       = 'puppet:///modules/hosting_basesetup/dotfiles_default/',
+  String $dotfile_sourcedir       = $::hosting_basesetup::usermanagement::user_dotfile_default_sourcedir,
 ) {
 
 

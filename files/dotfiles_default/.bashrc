@@ -37,6 +37,7 @@ lspath(){
 if (type vim >/dev/null 2>&1);then alias vi="vim -c 'set bg=dark' -c 'syntax enable'"; fi
 export EDITOR=vi
 
+alias ls="ls --color";
 alias l="ls -la";
 alias ll="ls -l" ;
 alias lf="ls -Fa";

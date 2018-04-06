@@ -7,6 +7,7 @@ class hosting_basesetup::monitoring (
   Array[String] $additional_agent_packages     = [],
   String $additional_agent_packages_ensure     = 'installed',
   Boolean $use_zabbix_agent_extensions         = false,
+  String  $use_zabbix_agent_extensions_pkgname = 'zabbix-agent-extensions',
   String  $use_zabbix_agent_extensions_release = 'present',
 ) {
   if $zabbix_agent {
@@ -35,7 +36,7 @@ class hosting_basesetup::monitoring (
 
   if $use_zabbix_agent_extensions and $zabbix_agent {
     # ensure that this package is part of the package repos
-    ensure_packages(['zabbix-agent-extensions'],
+    ensure_packages([$use_zabbix_agent_extensions_pkgname],
       {
         'ensure'  => $use_zabbix_agent_extensions_release,
         'require' => Class['zabbix::agent'],
@@ -43,7 +44,7 @@ class hosting_basesetup::monitoring (
     )
     file { '/etc/sudoers.d/zabbix':
       ensure => present,
-      mode   => '044',
+      mode   => '0440',
       owner  => 'root',
       group   => 'root',
     }

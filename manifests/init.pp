@@ -47,6 +47,9 @@ class hosting_basesetup (
   String $motd_description                     = "<no description>",
   Variant[String, Enum['no', 'yes']]
   $ssh_password_auth_string                    = 'no',
+  String $proxy_http_host                      = "",
+  String $proxy_http_port                      = "",
+  Boolean $proxy_https                         = true,
 ) {
 
   ## RESSOURCE ORDERING ##################################################################
@@ -167,9 +170,11 @@ options timeout:1 attempts:1 rotate
   ## LVM #################################################################################
   include ::lvm
 
+  ## PROXY ###############################################################################
+  include ::hosting_basesetup::proxy
+
   ## APT #################################################################################
   include apt
-
 
   ## UNATTENDED UPGRADES #################################################################
   if $unattended_upgrades {
