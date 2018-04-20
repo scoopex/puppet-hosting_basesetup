@@ -66,14 +66,15 @@ Currently not implemented/TODOs
 
 by priority:
 
-* Timed FStrim for Non-Rotational devices</br>
-  (already in place on ubuntu systems)
+* MOTD Details
+  * Blinking MOTD Disclaimer
+  * Documentation Link
 * SMART Daemon on non virtualized hardware systems
 * systemd journal configuration (housekeeping, permissions)
   https://www.freedesktop.org/software/systemd/man/journald.conf.html
   /etc/systemd/journald.conf
 * virtual serial consoles for server systems
-  => to support connect by virtual serial console by IPMI
+  => to support connect by virtual serial console by LOM management software
 * IPTables base setup for ipv4/ipv6, https://github.com/puppetlabs/puppetlabs-firewall
   * restrict for inbound everything except ssh
   * restrict outbound except essential os parameters
@@ -83,7 +84,7 @@ by priority:
 * IPMI Watchdog
 * enhanced network tuning
   (Port Ranges, Socket Buffers, tcp_sack, tcp_timestamps )
-* reduce deprecation warnings of used modules
+* reduce deprecation warnings of used puppet modules
 * specify exact versions for dependencies
 * use hiera data in module for distibution specific parameters
 * use testinfra as testing framework

@@ -1,0 +1,57 @@
+##############################################################################
+####
+#### FILE CREATED BY PUPPET, MODIFICATIONS WILL BE OVERWRITTEN
+
+<%
+def get_var(value, regex)
+  if ( value =~ regex )
+    return value
+  else
+    raise ArgumentError, "#{value} does not match to #{regex}"
+  end
+end
+%>
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+###########################################################################
+# Interface Associations
+
+<% @config['interface_associations'].each do |interface, bond| -%>
+auto <%= get_var(interface, /.+\d+/) %>
+iface <%= get_var(interface, /.+\d+/) %> inet manual
+    bond-master <%= get_var(bond, /.+\d+/) %>
+
+<% end -%>
+
+###########################################################################
+# Bonding/LACP Interfaces
+
+auto bond0
+iface bond0 inet static
+   bond-mode 802.3ad
+   bond-slaves none
+   # fast lacp rate, every second
+   bond-lacp-rate 0
+   # Calculate Link by: ((SRCportport XOR DSTport) XOR (IPsrc XOR IPdst)) DIV links
+   bond-xmit_hash_policy layer3+4
+   # check every 100ms link-status
+   bond-miimon 100
+   # wait for 200ms after a link is detected to be good to add it to bonding
+   bond-updelay 200
+   # on link errors, wait for 200ms to mark link to be down
+   bond-downdelay 200
+<% @config['dns_servers'].each do |dns| -%>
+   dns-nameserver <%= get_var(dns, /\d+\.\d+\.\d+\.\d+/) %>
+<% end -%>
+   address <%= get_var(@config['ip'], /\d+\.\d+\.\d+\.\d+/) %>
+   netmask <%= get_var(@config['netmask'], /\d+\.\d+\.\d+\.\d+/) %>
+   gateway <%= get_var(@config['gateway'], /\d+\.\d+\.\d+\.\d+/) %>
+
+####
+#### FILE CREATED BY PUPPET, MODIFICATIONS WILL BE OVERWRITTEN
+##############################################################################

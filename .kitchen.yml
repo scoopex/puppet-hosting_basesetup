@@ -24,7 +24,7 @@ busser:
 
 platforms:
   #- name: ubuntu-16.04-hosting_basesetup
-  - name: ubuntu-hosting_basesetup
+  - name: ubuntu16-hosting_basesetup
     driver_plugin: vagrant
     driver:
       vagrantfile_erb: vagrantfiles/Vagrantfile-debianoid.erb
@@ -37,6 +37,20 @@ platforms:
       #network:
       #- ['private_network', {ip: '192.168.33.33'}]
       #- ["forwarded_port", {guest: 8080, host: 8080}]
+  - name: ubuntu18-hosting_basesetup
+    driver_plugin: vagrant
+    driver:
+      vagrantfile_erb: vagrantfiles/Vagrantfile-debianoid.erb
+      box: ubuntu/bionic64
+      box_url: https://app.vagrantup.com/ubuntu/boxes/bionic64
+      synced_folders:
+        - ['./files', '/tmp/files']
+      #box: bento/ubuntu-17.10
+      #box_url: https://app.vagrantup.com/bento/boxes/ubuntu-17.10
+      #network:
+      #- ['private_network', {ip: '192.168.33.33'}]
+      #- ["forwarded_port", {guest: 8080, host: 8080}]
+
   - name: debian-hosting_basesetup
     driver_plugin: vagrant
     driver:

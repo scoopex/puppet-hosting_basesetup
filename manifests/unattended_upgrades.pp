@@ -3,10 +3,17 @@ class hosting_basesetup::unattended_upgrades (
   String $reboot_time = 'now',
   Array[String] $blacklist = [],
   Integer $random_sleep = 1800,
+  Boolean $enable,
 ) {
   case $::operatingsystem {
     'ubuntu', 'debian' : {
+        if $enable {
+          $enable_final = 1
+        }else{
+          $enable_final = 0
+        }
         class { 'unattended_upgrades':
+          enable => $enable_final,
           auto => { 
             'reboot' => $reboot,
             'reboot_time' => $reboot_time,

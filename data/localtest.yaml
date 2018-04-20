@@ -13,6 +13,19 @@ hosting_basesetup::proxy_https: true
 hosting_basesetup::time::ntp_client_restricts:
   - 'restrict 10.10.10.0 mask 255.255.255.0 nomodify notrap'
 
+hosting_basesetup::simple_files:
+  "/etc/interfaces.foo":
+    config:
+      interface_associations:
+        eth0: bondo0
+        eth1: bondo0
+      ip: 10.1.1.2
+      netmask: 255.255.252.0
+      gateway: 10.1.1.1
+      dns_servers:
+        - 9.9.9.9
+        - 8.8.8.8
+    template: "hosting_basesetup/simple_files/interfaces.erb"
 
 # Per device settings, especially useful for ssd devices
 hosting_basesetup::kernel::sysfs::config_items:
