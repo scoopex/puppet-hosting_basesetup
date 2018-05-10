@@ -1,4 +1,13 @@
 ---
+hosting_basesetup::motd_description: "Basesetup Testhost"
+hosting_basesetup::motd_announcement: |
+  Wow, the Hosting Basesetup seems to work!
+
+  The world and the universe are far more wonderful if there's not a puppet master.
+  Dave Matthews
+
+hosting_basesetup::motd_documentation: https://github.com/scoopex/puppet-hosting_basesetup/
+
 hosting_basesetup::mail_root_recipient: admin@foobar.de
 hosting_basesetup::mail_domain: foobar.de
 hosting_basesetup::rootpwhash: '$1$Etg2ExUZ$F9NTP7omafhKIlqaBMqng1'
@@ -38,6 +47,8 @@ hosting_basesetup::kernel::sysfs::config_items:
       "queue/scheduler": "deadline"
       "queue/rotational": "0"
 
+#hosting_basesetup::monitoring::zabbix_agent: false
+
 hosting_basesetup::monitoring::additional_agent_packages: 
   - 'curl'
 hosting_basesetup::usermanagement::restriction_tag: 'bigdata'
@@ -60,6 +71,15 @@ hosting_basesetup::groups:
   webdevhipsters:
     gid: 8002
     ensure: absent
+
+
+# override default settings
+hosting_basesetup::users_override:
+  user2:
+    fullname: Karl Napf2
+    ssh_keys: 
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCf8jizyqebUQ2hXJF5tWUz3eev+uE1liHZ7bMK4pp5nlaxkNq81dOLA9TZDbF6b+LFKKPxHUME5QypcDltaan83dN5tM+VJKz5K8qam9j8RpOm7gpKkomjXSTAMmhelZMLpOwhap77QVJo4EaKLqlkdRGh4o/dBnCOgkrZVjZ0TVG+u7BtGuQtbYvTBEL/Uu3HwWh4bGt5eFqyREgs6PE7u4bSnkyp6N/lrRqArefI0g2soNzOboxW2ONkAP6epNCRDDPp0erWJ1TU1VPLG72r2nupb7bdtTcDklGQMOWMWFvLzCkpD+LJDqh344gux1R45ikQqaL61ZqoV3Pt6t3xJ foo_thefinal@bar.de"
+
 
 hosting_basesetup::users:
   user1:

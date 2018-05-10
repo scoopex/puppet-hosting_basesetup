@@ -2,7 +2,9 @@
 #
 class hosting_basesetup::usermanagement (
   Hash $users                             = {},
+  Hash $users_override                    = {},
   Hash $groups                            = {},
+  Hash $groups_override                   = {},
   String $rootpwhash,
   Array[String] $ssh_keys_root            = [],
   Array[String] $ssh_keys_root_additional = [],
@@ -61,6 +63,9 @@ class hosting_basesetup::usermanagement (
       restriction_tags  => [],
     }
 
-    create_resources("hosting_basesetup::usermanagement::group", $groups)
-    create_resources("hosting_basesetup::usermanagement::user", $users)
+    $groups_final = deep_merge($groups, $groups_override)
+    $users_final = deep_merge($users, $users_override)
+
+    create_resources("hosting_basesetup::usermanagement::group", $groups_final)
+    create_resources("hosting_basesetup::usermanagement::user", $users_final)
   }

@@ -1,0 +1,10 @@
+#####################################################
+####
+#### FILE CREATED BY PUPPET, DO NOT EDIT
+<% @config['sudo_commands'].each do |cmd| -%>
+<%= @config['user'] %> ALL=(ALL) NOPASSWD: <%= cmd %>
+<% end -%>
+####
+#### FILE CREATED BY PUPPET, DO NOT EDIT
+#####################################################
+

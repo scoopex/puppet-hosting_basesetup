@@ -3,7 +3,7 @@ class hosting_basesetup::monitoring (
   String $zabbix_server                        = 'zabbix',
   String $zabbix_server_active                 = 'zabbix',
   String $zabbix_listenip                      = '127.0.0.1',
-  String $zabbix_hostmetadata                  = 'Linux',
+  String $zabbix_hostmetadata                  = '|Linux|Puppet|',
   Array[String] $additional_agent_packages     = [],
   String $additional_agent_packages_ensure     = 'installed',
   Boolean $use_zabbix_agent_extensions         = false,

@@ -18,30 +18,15 @@ end
 
 #  http://serverspec.org/resource_types.html
 
-#----------------------------------------------------------------------
-# testing basic service
-#----------------------------------------------------------------------
-describe package('postfix') do
-  it { should be_installed }
-end
-
-describe service('postfix') do
-  it { should be_enabled }
-end
-
-describe service('postfix') do
-  it { should be_running }
-end
-
 
 #----------------------------------------------------------------------
 # testing basic function
 #----------------------------------------------------------------------
 
-describe command('cat /etc/fstab|mail -s "TEST" devnull@256bit.org') do
-   its(:stderr) { should_not match(/..*/) }
+describe command('nslookup www.github.com') do
    its(:exit_status) { should eq 0 }
 end
+
 
 #----------------------------------------------------------------------
 

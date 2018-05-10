@@ -27,6 +27,11 @@ describe command('cat /home/user1/.ssh/authorized_keys ') do
    its(:stdout) { should match(/^ssh-rsa .*foo2@bar.de$/) }
 end
 
+describe command('cat /home/user2/.ssh/authorized_keys ') do
+   its(:stdout) { should match(/^ssh-rsa .*foo_thefinal@bar.de$/) }
+end
+
+
 describe command('cat /root/.ssh/authorized_keys ') do
    its(:stdout) { should_not match(/^ssh-rsa .*foo2@bar.de$/) }
 end

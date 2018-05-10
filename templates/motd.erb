@@ -4,8 +4,14 @@
   / /_/ / / / / __ \/ __ \/ _ \/ __/   
  / ____/ /_/ / /_/ / /_/ /  __/ /_     SYS: <%= @operatingsystem %> <%= @operatingsystemrelease %> <% if has_variable?("architecture") then %>/ <%= @architecture %><% end %> 
 /_/    \__,_/ .___/ .___/\___/\__/     ENV: <%= @environment %>
-           /_/   /_/                   DSC: <%= @motd_description %> 
+           /_/   /_/                   DSC: <%= @motd_description %>
 
+<% if @motd_documentation != "" %>
+[1;33mURL: <%= @motd_documentation %>[0m
+<% end -%>
+<% if @motd_announcement != "" %>
+[1;31m<%= @motd_announcement %>[0m
+<% end -%>
 -------------------------------------------------------------------------------------
 
 Puppet installation : Puppet <%= @puppetversion %> / Facter <%= @facterversion %>

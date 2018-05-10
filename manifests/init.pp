@@ -11,7 +11,7 @@
 #   A hashmap which defines a collection of users, check hosting_basesetup::usermanagement::user
 #   for details
 #
-# [groups]
+# [glroups]
 #   A hashmap which defines a collection of users, check hosting_basesetup::usermanagement::group
 #   for details
 #
@@ -32,7 +32,9 @@ class hosting_basesetup (
   Boolean $manage_puppet                       = true,
   String $rootpwhash,
   Hash $users                                  = {},
+  Hash $users_override                         = {},
   Hash $groups                                 = {},
+  Hash $groups_override                        = {},
   Array[String] $ntp_servers                   = ['ptbtime1.ptb.de', 'ptbtime2.ptb.de', 'ptbtime3.ptb.de', ],
   Boolean $mosh                                = false,
   String $mail_relayhost                       = '',
@@ -45,6 +47,8 @@ class hosting_basesetup (
   Integer $unattended_upgrades_random_sleep    = 1800,
   String $motd_template                        = "hosting_basesetup/motd.erb",
   String $motd_description                     = "<no description>",
+  String $motd_announcement                    = "",
+  String $motd_documentation                   = "",
   Variant[String, Enum['no', 'yes']]
   $ssh_password_auth_string                    = 'no',
   String $proxy_http_host                      = "",
@@ -68,35 +72,14 @@ class hosting_basesetup (
     mode    => '0644',
   }
   if $facts['os']['name'] == "Ubuntu" {
-    file { [ '/etc/update-motd.d/10-help-text', '/etc/update-motd.d/51-cloudguest', '/etc/update-motd.d/00-header' ]:
+    file { [ '/etc/update-motd.d/10-help-text', '/etc/update-motd.d/51-cloudguest', '/etc/update-motd.d/00-header',
+             '/etc/update-motd.d/80-livepatch', '/etc/update-motd.d/50-landscape-sysinfo' ]:
       ensure => absent,
     }
   }
 
-  ## DNS RESOLVING #######################################################################
-
-  if $facts['os']['name'] == "Ubuntu"  {
-    file { '/etc/resolvconf/resolv.conf.d/base':
-      ensure  => file,
-      content => "# see man resolv.conf
-options timeout:1 attempts:1 rotate
-        ",
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-    }
-    service { 'resolvconf':
-      ensure     => running,
-      enable     => true,
-      hasstatus  => true,
-      hasrestart => true,
-      subscribe => File['/etc/resolvconf/resolv.conf.d/base'],
-    }
-
-  }else {
-    notice("dns resolving configuration not implemented")
-  }
-
+  ## DNS RESOLVER SETUP ##################################################################
+  include hosting_basesetup::dns
 
   ## SSH #################################################################################
   # TODO: create secure client settings
@@ -110,12 +93,13 @@ options timeout:1 attempts:1 rotate
     sshd_config_challenge_resp_auth      => 'no',
     sshd_use_pam                         => 'yes',
     sshd_config_ciphers                  => [ 'aes256-ctr', 'aes192-ctr', 'aes128-ctr' ],
-    sshd_ignoreuserknownhosts            => 'yes',
+    sshd_ignoreuserknownhosts            => 'no',
     sshd_kerberos_authentication         => 'no',
     sshd_config_kexalgorithms            => [ 'diffie-hellman-group-exchange-sha256' ],
     sshd_config_loglevel                 => 'VERBOSE',
     sshd_config_login_grace_time         => '30s',
-    sshd_config_macs                     => [ 'hmac-sha2-512', 'hmac-sha2-256', 'hmac-ripemd160'],
+    sshd_config_macs                     => [ 'hmac-sha2-512', 'hmac-sha2-256',
+                                              'hmac-sha2-256-etm@openssh.com', 'hmac-sha2-512-etm@openssh.com'],
     sshd_config_maxauthtries             => 2,
     sshd_config_maxsessions              => 10,
     sshd_config_maxstartups              => '10:30:100',
@@ -126,10 +110,7 @@ options timeout:1 attempts:1 rotate
   }
 
   if $mosh {
-    ensure_packages(['mosh', ], {
-      'ensure' => 'present'
-    }
-    )
+    ensure_packages(['mosh', ], { 'ensure' => 'present' })
   }
 
   ## TIME ################################################################################
@@ -150,9 +131,11 @@ options timeout:1 attempts:1 rotate
 
   ## USERMANAGEMENT ######################################################################
   class { '::hosting_basesetup::usermanagement':
-    groups     => $groups,
-    users      => $users,
-    rootpwhash => $rootpwhash,
+    users           => $users,
+    users_override  => $users_override,
+    groups          => $groups,
+    groups_override => $groups_override,
+    rootpwhash      => $rootpwhash,
   }
 
   ## SOFTWARE ############################################################################
