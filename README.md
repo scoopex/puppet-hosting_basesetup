@@ -77,6 +77,9 @@ Currently not implemented/TODOs
 by priority:
 
 * finish ubuntu 18.04 support
+* remove dependency to puppet-zabbix<BR>
+  because this creates a huge amount of indirect dependencies to modules which do not have a relation to the things
+  perfomed by hosting_basesetup
 * SMART Daemon on non virtualized hardware systems
 * systemd journal configuration (housekeeping, permissions)
   https://www.freedesktop.org/software/systemd/man/journald.conf.html

@@ -40,6 +40,7 @@ class hosting_basesetup::monitoring (
       {
         'ensure'  => $use_zabbix_agent_extensions_release,
         'require' => Class['zabbix::agent'],
+        'before'  => [ File['/etc/zabbix/zabbix_agentd.conf'], Service['zabbix-agent'], ]
       }
     )
     file { '/etc/sudoers.d/zabbix':
@@ -56,6 +57,13 @@ class hosting_basesetup::monitoring (
 Include=/usr/share/zabbix-agent-extensions/include.d/
           ',
       notify  => Service['zabbix-agent'],
+    }
+    file_line { '/etc/zabbix/zabbix_agentd.conf':
+      ensure            => absent,
+      path              => '/etc/zabbix/zabbix_agentd.conf',
+      match             => '^Include=/usr/share/zabbix-agent-extensions/include.d/.*',
+      match_for_absence => true,
+      notify            => Service['zabbix-agent'],
     }
   }
 }

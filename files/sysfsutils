@@ -33,46 +33,47 @@ load_conffile() {
     sed  's/#.*$//; /^[[:space:]]*$/d;
 	  s/^[[:space:]]*\([^=[:space:]]*\)[[:space:]]*\([^=[:space:]]*\)[[:space:]]*=[[:space:]]*\(.*\)/\1 \2 \3/' \
 	  $FILE | {
-	while read f1 f2 f3; do
-	    if [ "$f1" = "mode" -a -n "$f2" -a -n "$f3" ]; then
-		if [ -f "/sys/$f2" ] || [ -d "/sys/$f2" ]; then
-		    chmod "$f3" "/sys/$f2"
-                    if [ "$?" != "0" ];then
-                        EXITCODE=1
-                    fi
-		else
-		    log_failure_msg "unknown attribute $f2"
-                    EXITCODE=1
-		fi
-	    elif [ "$f1" = "owner" -a -n "$f2" -a -n "$f3" ]; then
-		if [ -f "/sys/$f2" ]; then
-		    chown "$f3" "/sys/$f2"
-                    if [ "$?" != "0" ];then
-                        EXITCODE=1
-                    fi
-		else
-		    log_failure_msg "unknown attribute $f2"
-                    EXITCODE=1
-		fi
-	    elif [ "$f1" -a -n "$f2" -a -z "$f3" ]; then
-		if [ -f "/sys/$f1" ]; then
-		    # Some fields need a terminating newline, others
-		    # need the terminating newline to be absent :-(
-		     echo -n "$f2" > "/sys/$f1" 2>/dev/null ||
-			echo "$f2" > "/sys/$f1"
-                     if [ "$?" != "0" ];then
-                         EXITCODE=1
-                     fi
-		else
-		    log_failure_msg "unknown attribute $f1"
-                    EXITCODE=1
-		fi
-	    else
-		log_failure_msg "syntax error in $CONFFILE: '$f1' '$f2' '$f3'"
-		log_end_msg 1
-		exit 1
-	    fi
-	done
+            while read f1 f2 f3; do
+                if [ "$f1" = "mode" -a -n "$f2" -a -n "$f3" ]; then
+                  if [ -f "/sys/$f2" ] || [ -d "/sys/$f2" ]; then
+                      chmod "$f3" "/sys/$f2"
+                                if [ "$?" != "0" ];then
+                                    EXITCODE=1
+                                fi
+                  else
+                      log_failure_msg "unknown attribute $f2"
+                                EXITCODE=1
+                  fi
+                elif [ "$f1" = "owner" -a -n "$f2" -a -n "$f3" ]; then
+                  if [ -f "/sys/$f2" ]; then
+                      chown "$f3" "/sys/$f2"
+                                if [ "$?" != "0" ];then
+                                    EXITCODE=1
+                                fi
+                  else
+                      log_failure_msg "unknown attribute $f2"
+                                EXITCODE=1
+                  fi
+                elif [ "$f1" -a -n "$f2" -a -z "$f3" ]; then
+                  if [ -f "/sys/$f1" ]; then
+                      # Some fields need a terminating newline, others
+                      # need the terminating newline to be absent :-(
+                       echo -n "$f2" > "/sys/$f1" 2>/dev/null ||
+                       echo "$f2" > "/sys/$f1"
+                       if [ "$?" != "0" ];then
+                           log_failure_msg "unable to set /sys/$f1 == $fs"
+                           EXITCODE=1
+                       fi
+                  else
+                      log_failure_msg "unknown attribute $f1"
+                      EXITCODE=1
+                  fi
+                else
+                  log_failure_msg "syntax error in $CONFFILE: '$f1' '$f2' '$f3'"
+                  log_end_msg 1
+                  exit 1
+                fi
+            done
     }
 }
 

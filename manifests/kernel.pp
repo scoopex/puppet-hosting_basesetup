@@ -1,14 +1,15 @@
 class hosting_basesetup::kernel (
-  String  $ulimits_filename                      = '/etc/security/limits.d/hosting_basesetup.conf',
-  String  $grub_options                          = '',
-  Hash    $sysctl_config                         = {},
-  Boolean $sysctl_enable_fastnetworking_defaults = false,
-  Boolean $sysctl_enable_tcp_timeout_optimzation = false,
-  Boolean $sysctl_ignore_defaults                = false,
-  Hash    $sysfs_config                          = {},
-  Boolean $sysfs_ignore_defaults                 = false,
-  Boolean       $ulimit_ignore_defaults          = false,
-  Array[String] $ulimit_config                   = [],
+  String  $ulimits_filename                                  = '/etc/security/limits.d/hosting_basesetup.conf',
+  String  $grub_options                                      = '',
+  Hash    $sysctl_config                                     = {},
+  Boolean $sysctl_enable_fastnetworking_defaults             = false,
+  Boolean $sysctl_enable_tcp_timeout_optimzation             = false,
+  Boolean $sysctl_enable_automatic_reboot_on_kernel_problems = false,
+  Boolean $sysctl_ignore_defaults                            = false,
+  Hash    $sysfs_config                                      = {},
+  Boolean $sysfs_ignore_defaults                             = false,
+  Boolean       $ulimit_ignore_defaults                      = false,
+  Array[String] $ulimit_config                               = [],
 ) {
   include hosting_basesetup::kernel::sysfs
   include hosting_basesetup::kernel::sysctl

@@ -24,7 +24,7 @@ end
 #----------------------------------------------------------------------
 
 describe command('sysctl -n kernel.panic_on_oops') do
-   its(:stdout) { should match(/30/) }
+   its(:stdout) { should match(/0/) }
 end
 
 describe command('sysctl -n net.core.netdev_max_backlog') do
