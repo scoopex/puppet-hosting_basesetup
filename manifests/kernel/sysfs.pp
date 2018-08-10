@@ -16,7 +16,7 @@ class hosting_basesetup::kernel::sysfs (
   }
 
   if $ignore_defaults {
-    $config_final = $sysfs_config
+    $config_final = $config
   } else {
     $config_final = deep_merge(
       $config_transparent_hugepages_off,

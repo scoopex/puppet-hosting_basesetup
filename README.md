@@ -59,8 +59,10 @@ Things implemented with this setup
 * package installtion via hiera
   * numerous useful packages
   * set vim as standard editor
-* lvm management via hiera<BR>
-  (review https://github.com/puppetlabs/puppetlabs-lvm)
+* lvm
+  * lvm management via hiera<BR>
+    (see https://github.com/puppetlabs/puppetlabs-lvm)
+  * lvm automatic snapshotting
 * apt source management<BR>
   https://forge.puppet.com/puppetlabs/apt
 * unattended configurable os updates<BR>

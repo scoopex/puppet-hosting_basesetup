@@ -22,6 +22,25 @@ hosting_basesetup::proxy_https: true
 hosting_basesetup::time::ntp_client_restricts:
   - 'restrict 10.10.10.0 mask 255.255.255.0 nomodify notrap'
 
+hosting_basesetup::mounts:
+  '/nfs1':
+    device: 8.8.8.8:/srv/nfs/test1
+    fstype: nfs
+    ensure: unmounted
+    options: defaults
+    pass: 2
+    atboot: false
+
+
+hosting_basesetup::mounts_override:
+  '/nfs2':
+    device: 8.8.8.8:/srv/nfs/test2
+    fstype: nfs
+    ensure: unmounted
+    options: defaults
+    pass: 2
+    atboot: false
+
 hosting_basesetup::simple_files:
   "/etc/interfaces.foo":
     config:
@@ -125,3 +144,17 @@ hosting_basesetup::users:
     group_primary: 'devteam'
     ensure: present
     dotfile_sourcedir: "no"
+
+
+hosting_basesetup::lvm_snapshots:
+  "/dev/vg0/lv-foo":
+    ensure: present
+  "the_job":
+    ensure: present
+    cron_timespec: "0 3 * * *"
+    snap_create: true
+    snap_size:  "10G"
+    snap_delete: true
+    zabbix_notify: true
+    lvs:
+      - /dev/vg0/lv-bar

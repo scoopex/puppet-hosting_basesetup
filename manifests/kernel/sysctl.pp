@@ -92,7 +92,7 @@ class hosting_basesetup::kernel::sysctl (
   # Combine and create ressources
 
   if $ignore_defaults {
-    $config_final = $sysctl_config
+    $config_final = $config
   } else {
     $config_final = deep_merge(
       $stdkernel,

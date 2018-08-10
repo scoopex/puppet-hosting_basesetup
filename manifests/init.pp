@@ -35,6 +35,8 @@ class hosting_basesetup (
   Hash $users_override                         = {},
   Hash $groups                                 = {},
   Hash $groups_override                        = {},
+  Hash $mounts                                 = {},
+  Hash $mounts_override                        = {},
   Array[String] $ntp_servers                   = ['ptbtime1.ptb.de', 'ptbtime2.ptb.de', 'ptbtime3.ptb.de', ],
   Boolean $mosh                                = false,
   String $mail_relayhost                       = '',
@@ -54,7 +56,8 @@ class hosting_basesetup (
   String $proxy_http_host                      = "",
   String $proxy_http_port                      = "",
   Boolean $proxy_https                         = true,
-  Hash $simple_files = {},
+  Hash $simple_files                           = {},
+  Hash $lvm_snapshots                          = {},
 ) {
 
   ## FILE RESSOURCES   ##################################################################
@@ -73,7 +76,7 @@ class hosting_basesetup (
   }
   if $facts['os']['name'] == "Ubuntu" {
     file { [ '/etc/update-motd.d/10-help-text', '/etc/update-motd.d/51-cloudguest', '/etc/update-motd.d/00-header',
-             '/etc/update-motd.d/80-livepatch', '/etc/update-motd.d/50-landscape-sysinfo' ]:
+      '/etc/update-motd.d/80-livepatch', '/etc/update-motd.d/50-landscape-sysinfo' ]:
       ensure => absent,
     }
   }
@@ -99,7 +102,7 @@ class hosting_basesetup (
     sshd_config_loglevel                 => 'VERBOSE',
     sshd_config_login_grace_time         => '30s',
     sshd_config_macs                     => [ 'hmac-sha2-512', 'hmac-sha2-256',
-                                              'hmac-sha2-256-etm@openssh.com', 'hmac-sha2-512-etm@openssh.com'],
+      'hmac-sha2-256-etm@openssh.com', 'hmac-sha2-512-etm@openssh.com'],
     sshd_config_maxauthtries             => 2,
     sshd_config_maxsessions              => 10,
     sshd_config_maxstartups              => '10:30:100',
@@ -138,6 +141,11 @@ class hosting_basesetup (
     rootpwhash      => $rootpwhash,
   }
 
+  ## MOUNTPOINTS #########################################################################
+
+  $mountpoints_final = deep_merge($mounts, $mounts_override)
+  create_resources("::hosting_basesetup::mount", $mountpoints_final)
+
   ## SOFTWARE ############################################################################
   class { '::hosting_basesetup::packages':
   }
@@ -151,8 +159,11 @@ class hosting_basesetup (
 
     }
   }
+
   ## LVM #################################################################################
-  include ::lvm
+  class { '::hosting_basesetup::lvm':
+    snapshots => $lvm_snapshots,
+  }
 
   ## PROXY ###############################################################################
   include ::hosting_basesetup::proxy
@@ -165,11 +176,11 @@ class hosting_basesetup (
     notice("Unattended upgrades are disabled for this system, consider to activate it to improve system security ;-)")
   }
   class { '::hosting_basesetup::unattended_upgrades':
-      enable       => $unattended_upgrades,
-      reboot       => $unattended_upgrades_reboot,
-      reboot_time  => $unattended_upgrades_reboot_time,
-      blacklist    => $unattended_upgrades_blacklist,
-      random_sleep => $unattended_upgrades_random_sleep,
+    enable       => $unattended_upgrades,
+    reboot       => $unattended_upgrades_reboot,
+    reboot_time  => $unattended_upgrades_reboot_time,
+    blacklist    => $unattended_upgrades_blacklist,
+    random_sleep => $unattended_upgrades_random_sleep,
   }
 
   ## CRON AND AT #########################################################################

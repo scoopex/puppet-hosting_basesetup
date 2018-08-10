@@ -1,0 +1,271 @@
+#!/usr/bin/env python3
+
+
+# Script to manage lvm automatically snapshots
+# 
+# Marc Schoechlin <ms@256bit.org>
+# Marc Schoechlin <marc.schoechlin@vico-research.com>
+
+import json
+import subprocess
+import sys
+import os
+import argparse
+import datetime
+import time
+import fcntl
+import socket
+import re
+
+
+########################################################################################################################
+###
+### HELPERS
+
+def info(line):
+    if not args.quiet:
+        print(line)
+
+
+def error(line):
+    sys.stderr.write(line + "\n")
+
+
+def debug_cmd(out, err, force=False):
+    if args.debug or force:
+        sys.stderr.write("STDOUT: >>>%s<<<\n" % out.decode('utf8'))
+        sys.stderr.write("STDERR: >>>%s<<<\n" % err.decode('utf8'))
+
+
+def execute_cmd(cmd, dryrun=False):
+    info("=> '%s'" % cmd)
+    if dryrun:
+        return (0, "n/a", "n/a")
+    else:
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out, err = process.communicate()
+        if process.returncode != 0:
+            sys.stderr.write("FAILED\n")
+            debug_cmd(out, err, force=True)
+            sys.exit(1)
+        else:
+            debug_cmd(out, err)
+        return (process.returncode, out.decode('utf8'), err.decode('utf8'))
+
+
+file_handle = None
+
+
+def file_is_locked(file_path):
+    global file_handle
+
+    for i in range(1, 10):
+        file_handle = open(file_path, 'w')
+        try:
+            fcntl.lockf(file_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return False
+        except IOError:
+            time.sleep(1)
+    return True
+
+
+def extract_lv_details(lv):
+    m = re.match("(/.+?/)([^/]+)$", lv)
+    if not m:
+        raise Exception("unable to extract lv details")
+    lv_path = m.group(1)
+    lv_name = m.group(2)
+    return (lv_path, lv_name)
+
+
+def create_snapshot(lv, lv_size):
+    info("==> CREATING SNAPSHOT")
+    (lv_path, lv_name) = extract_lv_details(lv)
+
+    (exitcode_lspool, out_lvdisplay, err_lspool) = execute_cmd("lvdisplay")
+
+    found = False
+    for line in out_lvdisplay.splitlines():
+        m = re.match(("\s+LV Path\s+(.+%s$)" % lv), line)
+        if m:
+            found = True
+            break
+
+    if not found:
+        error("ERROR: this is not a logical volume")
+        return False
+
+    lv_snap_timestamp = datetime.datetime.now().isoformat().replace(":", "_")
+
+    snap_name = args.snapshot_prefix + lv_name + "_" + lv_snap_timestamp
+    snap_path = lv_path + snap_name
+
+    (exitcode_create_snap, out_create_snap, err_create_snap) = execute_cmd(
+        'lvcreate -L%s -s -n "%s" %s' % (lv_size, snap_name, lv), args.dryrun)
+
+    if (exitcode_create_snap != 0):
+        error("ERROR: snapshot creation failed")
+        ret = False
+    else:
+        ret = True
+    return ret
+
+
+def delete_snaps(lv, snap_match, max_snaps):
+    lvs = []
+    (exitcode_lspool, out_lvdisplay, err_lspool) = execute_cmd("lvdisplay")
+
+    regex = ("\s+LV Path\s+(.+%s$)" % snap_match)
+    for line in out_lvdisplay.splitlines():
+        m = re.match(("\s+LV Path\s+(.+%s$)" % snap_match), line)
+        if m:
+            lvs.append(m.group(1))
+
+    ret = True
+
+    sorted_snaps = sorted(lvs)
+    current_number_of_snaps = len(sorted_snaps)
+    info("==> CURRENT NUMBER OF SNAPSHOTS : %s" % current_number_of_snaps)
+    snaps_to_delete = 0
+    if max_snaps < current_number_of_snaps:
+        snaps_to_delete = current_number_of_snaps - args.max_snaps
+
+    snaps_deleted = 0
+
+    for snap in sorted_snaps:
+        if snaps_to_delete > 0:
+            info("==> DELETE")
+            snaps_to_delete -= 1
+            (exitcode_delete_snap, out_create_snap, err_create_snap) = execute_cmd(
+                "lvremove %s -y" % snap, args.dryrun)
+            if exitcode_delete_snap != 0:
+                error("ERROR: removal failed")
+                break
+            snaps_deleted += 1
+        else:
+            break
+
+    return (ret, current_number_of_snaps - snaps_deleted, snaps_deleted)
+
+
+########################################################################################################################
+###
+### MAIN
+
+
+parser = argparse.ArgumentParser(
+    description='perform lvm snapshots'
+)
+parser.add_argument(
+    '--debug',
+    help='Output debug information',
+    action='store_true',
+)
+
+parser.add_argument(
+    '--dryrun',
+    help='simulation mode',
+    action='store_true',
+)
+
+parser.add_argument(
+    '--quiet',
+    help='Suppress all non error output',
+    action='store_true',
+)
+
+parser.add_argument('--snapshot_prefix',
+                    type=str,
+                    nargs='?',
+                    help='snapshot prefix',
+                    default="FREEZE_"
+                    )
+
+parser.add_argument('--zabbix_notify',
+                    help='Create snapshots',
+                    action='store_true',
+                    )
+
+parser.add_argument(
+    '--snap',
+    help='Create snapshots',
+    action='store_true',
+)
+
+parser.add_argument('--lv_size',
+                    type=str,
+                    nargs='?',
+                    help='Size of snapshot, i.e 10G',
+                    default="10%",
+                    )
+
+parser.add_argument(
+    '--delete_snaps',
+    help='Automatically delete snapshots',
+    action='store_true',
+)
+
+parser.add_argument('--max_snaps',
+                    type=int,
+                    nargs='?',
+                    help='maximum number of snapshots, older snapshots will be deleted',
+                    default=3
+                    )
+
+args, lvs = parser.parse_known_args()
+
+if not re.match(r"^\d+(b|B|s|S|k|K|m|M|g|G|t|T|p|P|e|Ex|%)$", args.lv_size):
+    parser.error("specify a correct lv_size")
+
+if len(lvs) == 0:
+    parser.error("specify one or more logical volumes")
+
+lockfile = "/tmp/manage_lvm_snapshots.lock"
+
+if file_is_locked(lockfile):
+    error('ERROR: another instance is running, exiting now')
+    sys.exit(0)
+
+stat = {}
+stat["lvm.autosnapshot.status"] = []
+stat["lvm.autosnapshot.snaps_total"] = 0
+stat["lvm.autosnapshot.snaps_created"] = 0
+stat["lvm.autosnapshot.snaps_deleted"] = 0
+
+for lv in lvs:
+    info("LV: %s" % lv)
+
+    lvs = []
+    (lv_path, lv_name) = extract_lv_details(lv)
+
+    (exitcode_lspool, out_lvdisplay, err_lspool) = execute_cmd("lvdisplay")
+
+    if args.snap:
+        if not create_snapshot(lv, args.lv_size):
+            stat["lvm.autosnapshot.status"].append("unable to create snapshot for %s" % lv)
+            continue
+        stat["lvm.autosnapshot.snaps_created"] += 1
+
+
+
+    snap_match = "%s%s_\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2}.\d+" % (args.snapshot_prefix, lv_name)
+    if args.delete_snaps:
+        (ret, snaps_total, snaps_deleted) = delete_snaps(lv, snap_match, args.max_snaps)
+        if not ret:
+            stat["lvm.autosnapshot.status"].append("unable to delete snapshot for %s" % lv)
+        stat["lvm.autosnapshot.snaps_total"] += snaps_total
+        stat["lvm.autosnapshot.snaps_deleted"] += snaps_deleted
+
+if args.zabbix_notify:
+
+    if len(stat["lvm.autosnapshot.status"]) == 0:
+        stat["lvm.autosnapshot.status"] = "ALL OK"
+    else:
+        stat["lvm.autosnapshot.status"] = "ERROR:"+ (stat["lvm.autosnapshot.status"].join(" "))
+
+    for key, value in stat.items():
+        (exitcode_send_status, out_send_status, err_send_status) = \
+            execute_cmd("zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -s %s -k %s -o '%s' -vv" %
+                        (socket.gethostname(), key, value), args.dryrun)
+        if exitcode_send_status != 0:
+            error("ERROR: sending zabbix status failed")

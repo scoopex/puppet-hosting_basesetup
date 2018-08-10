@@ -12,7 +12,7 @@ mod 'camptocamp-postfix', '>=1.6.0'
 mod 'puppet-zabbix'
 mod 'puppetlabs-puppet_agent', '>=1.5.0'
 mod 'puppetlabs-lvm', '>=1.0.0'
-mod 'puppet-unattended_upgrades', '>=3.1.0'
+mod 'puppet-unattended_upgrades', '>=3.2.0'
 mod 'ghoneycutt-ssh', '>=3.56.1'
 
 #mod 'test_repo',
