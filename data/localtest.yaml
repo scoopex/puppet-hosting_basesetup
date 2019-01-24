@@ -66,10 +66,11 @@ hosting_basesetup::kernel::sysfs::config_items:
       "queue/scheduler": "deadline"
       "queue/rotational": "0"
 
-#hosting_basesetup::monitoring::zabbix_agent: false
+hosting_basesetup::zabbix_agent: true
 
-hosting_basesetup::monitoring::additional_agent_packages: 
-  - 'curl'
+hosting_basesetup::monitoring::zabbix_agent::additional_agent_packages:
+  - 'jq'
+
 hosting_basesetup::usermanagement::restriction_tag: 'bigdata'
 hosting_basesetup::cron_at::manage_user_scheduled_jobs: true
 hosting_basesetup::unattended_upgrades: true

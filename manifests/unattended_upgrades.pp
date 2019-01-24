@@ -35,4 +35,11 @@ class hosting_basesetup::unattended_upgrades (
     }
   }
 
+  file { '/usr/local/sbin/update-system':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0755',
+      source  => 'puppet:///modules/hosting_basesetup/update-system',
+   }
 }

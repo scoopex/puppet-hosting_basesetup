@@ -17,7 +17,7 @@ This project implements a basic system setup for the following platforms:
 
 This setup can be used as a base for server systems.
 The setup ist tested by using test-kitchen and serverspec tests.
-(for Details, review the [Documentation of the test setup](README_Test_Environment.mf))
+(for Details, review the [Documentation of the test setup](README_Test_Environment.md))
 
 Things implemented with this setup
 ----------------------------------
@@ -72,17 +72,19 @@ Things implemented with this setup
 * grub config</BR>
   (no splash, no quiet mode)
 
-
-Currently not implemented/TODOs
+Currently not implemented/open TODOs
 --------------------------------
 
 by priority:
 
-* finish ubuntu 18.04 support
-* remove dependency to puppet-zabbix<BR>
-  because this creates a huge amount of indirect dependencies to modules which do not have a relation to the things
-  perfomed by hosting_basesetup
+* install and configure puppet final agent config<BR>
+  (provide capability to switch environment)
+* Set in sshd
+  ```
+  AcceptEnv GIT_*
+  ```
 * SMART Daemon on non virtualized hardware systems
+  (smart values for SAS and SATA devices  are different)
 * systemd journal configuration (housekeeping, permissions)
   https://www.freedesktop.org/software/systemd/man/journald.conf.html
   /etc/systemd/journald.conf
@@ -91,7 +93,6 @@ by priority:
   * restrict outbound except essential os parameters
   * use groups of systems
 * (default) filesystemparameters
-* configure network interfaces
 * IPMI Watchdog
 * enhanced network tuning
   (Port Ranges, Socket Buffers, tcp_sack, tcp_timestamps )
@@ -100,9 +101,7 @@ by priority:
 * use hiera data in module for distibution specific parameters
 * use testinfra as testing framework
   https://testinfra.readthedocs.io/en/latest/
-* install and configure puppet final agent config<BR>
-  (provide capability to switch environment)
-* uniq userids, do not reuse old users and groups</BR>
+* unique userids, do not reuse old users and groups</BR>
   * implement a pool of outdated userids, uid, gids - remove them automatically
   * remove user directories after a specified amount of days
 * logshipping to syslog
@@ -115,4 +114,3 @@ Contribution
  * file a bug on the github project: https://github.com/scoopex/puppet-hosting_basesetup/issues
  * fork the project and improve the template
  * create a pull/merge request
-

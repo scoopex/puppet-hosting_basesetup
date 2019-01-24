@@ -17,10 +17,18 @@ import fcntl
 import socket
 import re
 
-
 ########################################################################################################################
 ###
-### HELPERS
+# HELPERS
+
+os.environ["PATH"] += os.pathsep + os.pathsep.join(['/sbin', '/usr/bin', '/usr/bin'])
+os.environ["LANG"] = "C"
+
+LVDISPLAY_CMD = 'lvdisplay'
+LVCREATE_CMD = 'lvcreate'
+LVREMOVE_CMD = 'lvremove'
+ZABBIX_SENDER_CMD = 'zabbix_sender'
+
 
 def info(line):
     if not args.quiet:
@@ -40,17 +48,16 @@ def debug_cmd(out, err, force=False):
 def execute_cmd(cmd, dryrun=False):
     info("=> '%s'" % cmd)
     if dryrun:
-        return (0, "n/a", "n/a")
+        return 0, "n/a", "n/a"
     else:
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = process.communicate()
         if process.returncode != 0:
             sys.stderr.write("FAILED\n")
             debug_cmd(out, err, force=True)
-            sys.exit(1)
         else:
             debug_cmd(out, err)
-        return (process.returncode, out.decode('utf8'), err.decode('utf8'))
+        return process.returncode, out.decode('utf8'), err.decode('utf8')
 
 
 file_handle = None
@@ -75,14 +82,14 @@ def extract_lv_details(lv):
         raise Exception("unable to extract lv details")
     lv_path = m.group(1)
     lv_name = m.group(2)
-    return (lv_path, lv_name)
+    return lv_path, lv_name
 
 
 def create_snapshot(lv, lv_size):
     info("==> CREATING SNAPSHOT")
-    (lv_path, lv_name) = extract_lv_details(lv)
+    lv_path, lv_name = extract_lv_details(lv)
 
-    (exitcode_lspool, out_lvdisplay, err_lspool) = execute_cmd("lvdisplay")
+    exitcode_lspool, out_lvdisplay, err_lspool = execute_cmd(LVDISPLAY_CMD)
 
     found = False
     for line in out_lvdisplay.splitlines():
@@ -100,10 +107,10 @@ def create_snapshot(lv, lv_size):
     snap_name = args.snapshot_prefix + lv_name + "_" + lv_snap_timestamp
     snap_path = lv_path + snap_name
 
-    (exitcode_create_snap, out_create_snap, err_create_snap) = execute_cmd(
-        'lvcreate -L%s -s -n "%s" %s' % (lv_size, snap_name, lv), args.dryrun)
+    exitcode_create_snap, out_create_snap, err_create_snap = execute_cmd(
+        '%s -L%s -s -n "%s" %s' % (LVCREATE_CMD, lv_size, snap_name, lv), args.dryrun)
 
-    if (exitcode_create_snap != 0):
+    if exitcode_create_snap != 0:
         error("ERROR: snapshot creation failed")
         ret = False
     else:
@@ -111,19 +118,55 @@ def create_snapshot(lv, lv_size):
     return ret
 
 
-def delete_snaps(lv, snap_match, max_snaps):
+def check_snaps(snap_match):
+    exitcode_lspool, out_lvdisplay, err_lspool = execute_cmd(LVDISPLAY_CMD)
+
+    regex_lv_section = "\s+--- Logical volume ---"
+    regex_lv_path = ("\s+LV Path\s+(.+%s$)" % snap_match)
+    regex_lv_snap_alloc = "\s+Allocated to snapshot\s+([\d\.]+)%"
+
+    lv_name = None
+    lv_max_alloc = 0
+
+    for line in out_lvdisplay.splitlines():
+
+        if re.match(regex_lv_section, line):
+            lv_name = None
+            continue
+
+        m = re.match(regex_lv_path, line)
+        if m:
+            lv_name = m.group(1)
+            continue
+
+        if lv_name:
+            m = re.match(regex_lv_snap_alloc, line)
+            if m:
+                if float(m.group(1)) > args.snap_max_alloc_limit:
+                    print("CHECK FAILED: %s : %s%% > %s%%" % (lv_name, m.group(1), args.snap_max_alloc_limit))
+                if lv_max_alloc < float(m.group(1)):
+                    lv_max_alloc = float(m.group(1))
+
+    if lv_max_alloc > args.snap_max_alloc_limit:
+        return "at least one snapshot too big %s > %s" % (lv_max_alloc, args.snap_max_alloc_limit)
+    else:
+        return None
+
+
+def delete_snaps(snap_match, max_snaps):
     lvs = []
-    (exitcode_lspool, out_lvdisplay, err_lspool) = execute_cmd("lvdisplay")
+    exitcode_lspool, out_lvdisplay, err_lspool = execute_cmd(LVDISPLAY_CMD)
 
     regex = ("\s+LV Path\s+(.+%s$)" % snap_match)
     for line in out_lvdisplay.splitlines():
-        m = re.match(("\s+LV Path\s+(.+%s$)" % snap_match), line)
+        m = re.match(regex, line)
         if m:
             lvs.append(m.group(1))
 
+    sorted_snaps = sorted(lvs)
+
     ret = True
 
-    sorted_snaps = sorted(lvs)
     current_number_of_snaps = len(sorted_snaps)
     info("==> CURRENT NUMBER OF SNAPSHOTS : %s" % current_number_of_snaps)
     snaps_to_delete = 0
@@ -137,7 +180,7 @@ def delete_snaps(lv, snap_match, max_snaps):
             info("==> DELETE")
             snaps_to_delete -= 1
             (exitcode_delete_snap, out_create_snap, err_create_snap) = execute_cmd(
-                "lvremove %s -y" % snap, args.dryrun)
+                "%s %s -y" % (LVREMOVE_CMD, snap), args.dryrun)
             if exitcode_delete_snap != 0:
                 error("ERROR: removal failed")
                 break
@@ -145,12 +188,12 @@ def delete_snaps(lv, snap_match, max_snaps):
         else:
             break
 
-    return (ret, current_number_of_snaps - snaps_deleted, snaps_deleted)
+    return ret, current_number_of_snaps - snaps_deleted, snaps_deleted
 
 
 ########################################################################################################################
 ###
-### MAIN
+# MAIN
 
 
 parser = argparse.ArgumentParser(
@@ -212,6 +255,13 @@ parser.add_argument('--max_snaps',
                     default=3
                     )
 
+parser.add_argument('--snap_max_alloc_limit',
+                    type=float,
+                    nargs='?',
+                    help='maximum percentage of snapshot allocation in percent',
+                    default=90.0
+                    )
+
 args, lvs = parser.parse_known_args()
 
 if not re.match(r"^\d+(b|B|s|S|k|K|m|M|g|G|t|T|p|P|e|Ex|%)$", args.lv_size):
@@ -226,7 +276,7 @@ if file_is_locked(lockfile):
     error('ERROR: another instance is running, exiting now')
     sys.exit(0)
 
-stat = {}
+stat = dict()
 stat["lvm.autosnapshot.status"] = []
 stat["lvm.autosnapshot.snaps_total"] = 0
 stat["lvm.autosnapshot.snaps_created"] = 0
@@ -238,7 +288,7 @@ for lv in lvs:
     lvs = []
     (lv_path, lv_name) = extract_lv_details(lv)
 
-    (exitcode_lspool, out_lvdisplay, err_lspool) = execute_cmd("lvdisplay")
+    exitcode_lspool, out_lvdisplay, err_lspool = execute_cmd(LVDISPLAY_CMD)
 
     if args.snap:
         if not create_snapshot(lv, args.lv_size):
@@ -246,26 +296,28 @@ for lv in lvs:
             continue
         stat["lvm.autosnapshot.snaps_created"] += 1
 
-
-
     snap_match = "%s%s_\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2}.\d+" % (args.snapshot_prefix, lv_name)
     if args.delete_snaps:
-        (ret, snaps_total, snaps_deleted) = delete_snaps(lv, snap_match, args.max_snaps)
+        ret, snaps_total, snaps_deleted = delete_snaps(snap_match, args.max_snaps)
         if not ret:
             stat["lvm.autosnapshot.status"].append("unable to delete snapshot for %s" % lv)
         stat["lvm.autosnapshot.snaps_total"] += snaps_total
         stat["lvm.autosnapshot.snaps_deleted"] += snaps_deleted
+
+    snap_error_status = check_snaps(snap_match)
+    if snap_error_status:
+        stat["lvm.autosnapshot.status"].append("%s - %s" % (lv, snap_error_status))
 
 if args.zabbix_notify:
 
     if len(stat["lvm.autosnapshot.status"]) == 0:
         stat["lvm.autosnapshot.status"] = "ALL OK"
     else:
-        stat["lvm.autosnapshot.status"] = "ERROR:"+ (stat["lvm.autosnapshot.status"].join(" "))
+        stat["lvm.autosnapshot.status"] = "ERROR: %s" % (" ".join(stat["lvm.autosnapshot.status"]))
 
     for key, value in stat.items():
-        (exitcode_send_status, out_send_status, err_send_status) = \
-            execute_cmd("zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -s %s -k %s -o '%s' -vv" %
-                        (socket.gethostname(), key, value), args.dryrun)
+        exitcode_send_status, out_send_status, err_send_status = \
+            execute_cmd("%s -c /etc/zabbix/zabbix_agentd.conf -s %s -k %s -o '%s' -vv" %
+                        (ZABBIX_SENDER_CMD, socket.gethostname(), key, value), args.dryrun)
         if exitcode_send_status != 0:
             error("ERROR: sending zabbix status failed")

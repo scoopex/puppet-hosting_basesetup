@@ -19,6 +19,7 @@ alias DATE='date "+%Y-%m-%d_%H-%M-%S"';
 alias puppetrun="puppet agent --test";
 
 alias pstime="ps -eo pid,etime,cmd";
+alias psrss="ps -eo rss,pid,user,command --sort -size|awk '{ hr=\$1/1024 ; sum=hr+sum; print \$0 }END{print \"Total RSS: \" sum \" MB\"}'"
 
 type -p less >/dev/null 2>&1 && export PAGER=less
 

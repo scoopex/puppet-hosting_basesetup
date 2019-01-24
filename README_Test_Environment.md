@@ -119,18 +119,23 @@ Cheat Sheet
 -----------
 
 ```
-Command                  Description
-kitchen list             View all test suites
-kitchen create           Create the target system (Vagrant)
+Command                              Description
+------------------------------------------------------------------------
+kitchen list                         View all test suites
+kitchen create                       Create the target system (Vagrant)
 kitchen create <suite>
-kitchen converge <suite> Execute puppet (Puppet)
-kitchen login <suite>    SSH Login
-kitchen verify <suite>   Execute test suites (servespec)
-kitchen test <suite>     Create, test and destroy system
-kitchen destroy          Destroy all test systems
-kitchen destroy <suite>  Destroy a certain test system
+kitchen converge <suite>             Execute puppet (Puppet)
+kitchen login <suite>                SSH Login
+kitchen verify <suite>               Execute test suites (servespec)
+kitchen test <suite>                 Create, test and destroy system
+kitchen destroy                      Destroy all test systems
+kitchen destroy <suite>              Destroy a certain test system
 
-kitchen verify -l debug  Get enhanced debug information
+kitchen verify -l debug              Get enhanced debug information
+
+librarian-puppet install --verbose   Debug librarian problems
+librarian-puppet show --detailed     Show librarian dependencies
+------------------------------------------------------------------------
 ```
 
 Instance selection/handling:
@@ -181,40 +186,6 @@ Develop and test puppet code
    kitchen destroy <instance>
    ```
 
-
-Use it in your own project
-------------------------------------
-
- * Fork in on github, name it puppet-<projectname>
- * Clone the repo
- * Rename the folder to the name of your project, "puppet-<your-project-name>
- * Replace all occurrences of the template name
-   ```
-   cd <project>
-   PROJECT_NAME="$(basename $PWD|sed '~s,puppet-,,')"
-   grep -n -r "hosting_basesetup" .|cut -d ':' -f1|sort -u|xargs sed -i "~s,hosting_basesetup,${PROJECT_NAME},g"
-   ```
- * Execute the steps in section "Develop and test puppet code"
- * Commit && Push
-
-Merge changes of the template to your project
----------------------------------------------
-
- * Using GIT
-   ```
-   git remote add upstream https://github.com/scoopex/puppet-hosting_basesetup.git
-   git fetch upstream
-   git checkout master
-   git merge upstream/master
-   ```
- * Manual (time consuming way) way
-   ```
-   cd /tmp
-   git clone https://github.com/scoopex/puppet-hosting_basesetup.git
-   cd /your-project
-   diff -r --brief -x .librarian -x .git -x Gemfile.lock -x .kitchen -x .tmp /tmp/puppet-hosting_basesetup
-   vim -d /tmp/puppet-hosting_basesetup/<file> <file>
-   ```
 
 Contribution
 ------------

@@ -13,7 +13,10 @@ define hosting_basesetup::mount (
 
   if ($fstype == "nfs") {
     # TODO: Implement IDMAP Settings
-    ensure_packages(["nfs-common"], { ensure => 'present', before => Mount[$name] })
+    ensure_packages(["nfs-common"], { ensure => 'installed' })
+    $require_final = [Package['nfs-common']]
+  }else {
+    $require_final = []
   }
 
   exec { "create_folder_${name}":
@@ -31,5 +34,6 @@ define hosting_basesetup::mount (
     options => $options,
     dump    => $dump,
     pass    => $pass,
+    require => $require_final,
   }
 }

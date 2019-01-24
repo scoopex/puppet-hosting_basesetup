@@ -52,6 +52,9 @@ end
 # testing basic function
 #----------------------------------------------------------------------
 
+# if your vagrant system was temporarily disconnected from network, this might fail
+# restart ntp and try again :-)
+
 describe command('ntpq -c peers') do
   its(:stdout) { should match(/^\*/) }
 end
