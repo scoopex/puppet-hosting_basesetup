@@ -171,7 +171,7 @@ MaxLinesPerSecond=100
 ### Option: Timeout
 #	Spend no more than Timeout seconds on processing
 #
-Timeout=3
+Timeout=10
 
 ### Option: AllowRoot
 #	Allow the agent to run as 'root'. If disabled and the agent is started by 'root', the agent
@@ -223,7 +223,7 @@ UnsafeUserParameters=0
 #	Full path to location of agent modules.
 #	Default depends on compilation options.
 #
-LoadModulePath=/usr/lib/modules
+LoadModulePath=<%= get_var(@load_module_path, /.+/) %>
 
 
 ### Option: LoadModule

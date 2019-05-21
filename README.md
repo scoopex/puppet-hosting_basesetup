@@ -71,12 +71,16 @@ Things implemented with this setup
 * ulimits
 * grub config</BR>
   (no splash, no quiet mode)
+* execute fstrim at random time i.e. to prevent load spikes on the storage system 
+  (sunday, between 11AM and 4PM)
 
 Currently not implemented/open TODOs
 --------------------------------
 
 by priority:
 
+* disable updatedb
+  chmod -x /etc/cron.daily/mlocate
 * install and configure puppet final agent config<BR>
   (provide capability to switch environment)
 * Set in sshd
@@ -93,7 +97,6 @@ by priority:
   * restrict outbound except essential os parameters
   * use groups of systems
 * (default) filesystemparameters
-* IPMI Watchdog
 * enhanced network tuning
   (Port Ranges, Socket Buffers, tcp_sack, tcp_timestamps )
 * reduce deprecation warnings of used puppet modules
@@ -106,7 +109,6 @@ by priority:
   * remove user directories after a specified amount of days
 * logshipping to syslog
 * logstash/graylog support
-* aide intrusion detection
 
 Contribution
 ------------

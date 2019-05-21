@@ -5,7 +5,6 @@ define hosting_basesetup::simple_directory (
   String $group    = 'root',
   String $mode     = '0700',
 ) {
-
   file { $filename:
     ensure => $ensure,
     owner  => $owner,

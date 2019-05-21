@@ -64,6 +64,7 @@ class hosting_basesetup (
   Hash $simple_directories                     = {},
   Hash $lvm_snapshots                          = {},
   Boolean $zabbix_agent                        = false,
+  String $puppet_envionment                    = $::environment,
 ) {
 
   ## DIR RESSOURCES   ##################################################################
@@ -75,6 +76,7 @@ class hosting_basesetup (
   ## KERNEL ##############################################################################
   include ::hosting_basesetup::kernel
 
+
   ## MOTD ################################################################################
   file { '/etc/motd':
     ensure  => file,
@@ -84,15 +86,17 @@ class hosting_basesetup (
     mode    => '0644',
   }
   if $facts['os']['name'] == "Ubuntu" {
-    file { [ '/etc/update-motd.d/10-help-text', '/etc/update-motd.d/50-motd-news',
+    file { [ '/etc/cron.weekly/update-notifier-common',
+      '/etc/update-motd.d/10-help-text', '/etc/update-motd.d/50-motd-news',
       '/etc/update-motd.d/51-cloudguest', '/etc/update-motd.d/00-header',
       '/etc/update-motd.d/80-livepatch', '/etc/update-motd.d/50-landscape-sysinfo' ]:
       ensure => absent,
     }
   }
 
-  ## DNS RESOLVER SETUP ##################################################################
-  include hosting_basesetup::dns
+  ## CRASH-MANAGEMENT ####################################################################
+
+  include hosting_basesetup::crash_management
 
   ## SSH #################################################################################
   # TODO: create secure client settings
@@ -170,6 +174,14 @@ class hosting_basesetup (
 
   include ::hosting_basesetup::packages
 
+  ## NETWORKING ##########################################################################
+
+  class { '::hosting_basesetup::networking':
+    before => Class['::hosting_basesetup::dns']
+  }
+  class { '::hosting_basesetup::dns':
+  }
+
   ## MONITORING ##########################################################################
 
   if $zabbix_agent {
@@ -179,24 +191,22 @@ class hosting_basesetup (
   ## PUPPET AGENT ########################################################################
   if $manage_puppet {
     class { '::puppet_agent':
+      service_names => 'puppet',
+    }
+    service { 'mcollective':
+        ensure     => stopped,
+        enable     => false,
+        hasstatus  => true,
+        hasrestart => true,
     }
 
     if $manage_puppet_set_evironment {
-
       file_line { 'set_puppet_environment':
-       path    => '/etc/puppetlabs/puppet/puppet.conf',
-       line    => "environment = ${::environment}",
-       match   => '^\s*environment\s*=\s*.+',
-       require => Class['::puppet_agent'],
+        path    => '/etc/puppetlabs/puppet/puppet.conf',
+        line    => "environment = ${puppet_envionment}",
+        match   => '^\s*environment\s*=\s*.+',
+        require => Class['::puppet_agent'],
       }
-      # augeas { "set_puppet_environment":
-      #   lens    => "Puppet.lns",
-      #   incl    => "/files/etc/puppetlabs/puppet/puppet.conf",
-      #   changes => [
-      #     "rm main/directive/environment",
-      #     "set main/directive/environment \"${::environment}\"",
-      #     ],
-      # }
       exec { 'restart_agent_set_puppet_environment':
         command     => 'systemctl restart puppet',
         refreshonly => true,
@@ -230,5 +240,6 @@ class hosting_basesetup (
   }
 
   ## CRON AND AT #########################################################################
-  include hosting_basesetup::cron_at
+  include ::hosting_basesetup::cron_at
+  include ::hosting_basesetup::filesystems
 }

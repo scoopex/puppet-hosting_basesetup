@@ -19,6 +19,8 @@ hosting_basesetup::proxy_http_host: "8.8.8.8"
 hosting_basesetup::proxy_http_port: "8888"
 hosting_basesetup::proxy_https: true
 
+hosting_basesetup::networking::disable_netplan: true
+
 hosting_basesetup::time::ntp_client_restricts:
   - 'restrict 10.10.10.0 mask 255.255.255.0 nomodify notrap'
 

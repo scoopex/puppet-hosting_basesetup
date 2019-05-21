@@ -10,6 +10,7 @@ class hosting_basesetup::kernel (
   Boolean $sysfs_ignore_defaults                             = false,
   Boolean       $ulimit_ignore_defaults                      = false,
   Array[String] $ulimit_config                               = [],
+  Array[String] $packages                                    = [],
 ) {
   include hosting_basesetup::kernel::sysfs
   include hosting_basesetup::kernel::sysctl
@@ -23,6 +24,8 @@ class hosting_basesetup::kernel (
     '*                hard    core       unlimited   # Allow corefiles to be temporarily enabled.',
     '*                hard    nproc      10240       # Prevent fork-bombs from taking out the system.',
   ]
+
+  ensure_packages($packages, { ensure => 'installed' })
 
   if $ulimit_ignore_defaults {
     $ulimit_config_final = $ulimit_config

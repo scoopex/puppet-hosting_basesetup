@@ -1,15 +1,17 @@
 define hosting_basesetup::usermanagement::group (
-  String $groupname     = $title,
+  String $groupname                 = $title,
   Integer $gid,
-  String $sudo_template = "",
-  Array[String] $restriction_tags = [],
-  String $ensure        = present,) {
+  String $sudo_template             = "",
+  Array[String] $restriction_tags   = [],
+  Boolean $restriction_tags_enforce = false,
+  String $ensure                    = present,
+) {
 
 
-  if ($ensure == "present" and length($restriction_tags) > 0)
-    {
+  if ($restriction_tags_enforce or (length($restriction_tags) > 0 and $::hosting_basesetup::usermanagement::restriction_tag != ''))
+  {
     if $::hosting_basesetup::usermanagement::restriction_tag in $restriction_tags {
-      $ensure_final = 'present'
+      $ensure_final = $ensure
     } else {
       $ensure_final = 'absent'
     }
@@ -18,8 +20,8 @@ define hosting_basesetup::usermanagement::group (
   }
 
   group { $groupname:
-    ensure => $ensure_final,
-    gid    => $gid,
+    ensure  => $ensure_final,
+    gid     => $gid,
     require => File_Line['min_gid'],
   }
 

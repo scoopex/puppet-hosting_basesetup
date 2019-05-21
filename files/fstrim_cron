@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SLEEP="${1:-0}"
+if [ "$SLEEP" != "0" ];then
+  RANDOM_SLEEP=$(( ( $RANDOM % $SLEEP )  + 1 ))
+  echo "waiting for $RANDOM_SLEEP seconds before fstrim"
+  sleep $RANDOM_SLEEP
+fi
+echo "executing now: fstrim --all -v"
+time fstrim --all -v
+
