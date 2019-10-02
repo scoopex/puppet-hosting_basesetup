@@ -1,9 +1,8 @@
 <%
 def get_var(value, regex)
-  if ( value =~ regex )
+  if ( value.to_s =~ regex )
     return value
   else
-    puts exception.backtrace
     raise ArgumentError, ">>>#{value}<<< does not match to regex >>>#{regex}<<< : #{caller[0]}"
   end
 end
@@ -208,7 +207,7 @@ Include=/etc/zabbix/zabbix_agentd.d
 #	0 - do not allow
 #	1 - allow
 #
-UnsafeUserParameters=0
+UnsafeUserParameters=<%= get_var(@unsafe_parameters, /^[01]$/) %>
 
 ### Option: UserParameter
 #	User-defined parameter to monitor. There can be several user-defined parameters.

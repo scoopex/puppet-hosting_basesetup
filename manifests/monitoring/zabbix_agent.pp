@@ -8,6 +8,7 @@ class hosting_basesetup::monitoring::zabbix_agent (
   String $listenip                         = '127.0.0.1',
   String $hostmetadata                     = '|Linux|Puppet|',
   Array[String] $additional_agent_packages = [],
+  Integer $unsafe_parameters               = 0,
   String $additional_agent_packages_ensure = 'installed',
   Boolean $use_agent_extensions            = false,
   String  $use_agent_extensions_pkgname    = 'zabbix-agent-extensions',

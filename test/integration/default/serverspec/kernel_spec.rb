@@ -28,7 +28,7 @@ describe command('sysctl -n kernel.panic_on_oops') do
 end
 
 describe command('sysctl -n net.core.netdev_max_backlog') do
-   its(:stdout) { should match(/30000/) }
+   its(:stdout) { should match(/250000/) }
 end
 
 describe command('ulimit -n') do

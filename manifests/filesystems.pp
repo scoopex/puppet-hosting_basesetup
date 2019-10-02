@@ -32,7 +32,7 @@ class hosting_basesetup::filesystems (
       ensure  => present,
       owner   => 'root',
       group   => 'root',
-      mode    => '0755',
+      mode    => '0644',
       content => "# created by puppet
 ${fstrim_cron_pattern} root /usr/local/sbin/fstrim_cron ${fstrim_randomize_seconds} 2>&1 |logger -t fstrim_cron
 ",

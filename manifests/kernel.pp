@@ -3,6 +3,7 @@ class hosting_basesetup::kernel (
   String  $grub_options                                      = '',
   Hash    $sysctl_config                                     = {},
   Boolean $sysctl_enable_fastnetworking_defaults             = false,
+  Boolean $sysctl_enable_lowlatencynetworking_defaults       = false,
   Boolean $sysctl_enable_tcp_timeout_optimzation             = false,
   Boolean $sysctl_enable_automatic_reboot_on_kernel_problems = false,
   Boolean $sysctl_ignore_defaults                            = false,

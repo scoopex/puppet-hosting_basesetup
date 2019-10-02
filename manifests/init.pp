@@ -129,11 +129,11 @@ class hosting_basesetup (
     sshd_config_maxsessions              => 10,
     sshd_config_maxstartups              => '10:30:100',
     sshd_config_strictmodes              => 'yes',
-    sshd_config_use_privilege_separation => 'sandbox',
     sshd_config_print_motd               => 'no',
     sshd_config_subsystem_sftp           => $sshd_config_subsystem_sftp,
     sshd_config_match                    => $sshd_config_match,
     permit_root_login                    => 'without-password',
+    sshd_config_serverkeybits            => undef,
   }
 
   if $mosh {
