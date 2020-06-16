@@ -1,18 +1,18 @@
 define hosting_basesetup::usermanagement::user (
-  String $username                  = $title,
+  String $username                             = $title,
   String $group_primary,
   Integer $uid,
   String $fullname,
-  String $homedir_base              = "/home",
-  Array[String] $groups             = [],
-  Array[String] $ssh_keys           = [],
-  Array[String] $restriction_tags   = [],
-  Boolean $restriction_tags_enforce = false,
-  String $ensure                    = 'present',
-  String $passwordhash              = '*',
-  String $mail                      = 'Mailadress not specified',
-  String $shell                     = '/bin/bash',
-  String $dotfile_sourcedir         = $::hosting_basesetup::usermanagement::user_dotfile_default_sourcedir,
+  String $homedir_base                         = "/home",
+  Array[String] $groups                        = [],
+  Array[String] $ssh_keys                      = [],
+  Array[String] $restriction_tags              = [],
+  Boolean $restriction_tags_enforce            = false,
+  Enum['present', 'absent', 'defined'] $ensure = 'present',
+  String $passwordhash                         = '*',
+  String $mail                                 = 'Mailadress not specified',
+  String $shell                                = '/bin/bash',
+  String $dotfile_sourcedir                    = $::hosting_basesetup::usermanagement::user_dotfile_default_sourcedir,
 ) {
 
 
@@ -67,6 +67,10 @@ define hosting_basesetup::usermanagement::user (
         recurse => remote,
       }
     }
+    anchor { "hosting_basesetup_user_uid_${uid}": } # prevents duplicate allocation of uids
+  }elsif ($ensure_final == 'defined') {
+    notice("defined, but not present here")
+    anchor { "hosting_basesetup_user_uid_${uid}": } # prevents duplicate allocation of uids
   }else {
     file { "${homedir_base}/${username}/.ssh/authorized_keys":
       ensure => 'absent',

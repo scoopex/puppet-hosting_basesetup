@@ -28,7 +28,7 @@ class hosting_basesetup::kernel::sysctl (
   # Makes only sense on webservers/application servers where drastic reboot helps to get rid of performance problems
   # 'vm.panic_on_oom'=> { 'value'=> '1' } ,
   $stdkernel = {
-    'vm.swappiness'        => { 'value' => '1' },
+    'vm.swappiness'        => { 'value' => '0' },
     'fs.aio-max-nr'        => { 'value' => '262144' },
     'fs.file-max'          => { 'value' => '1000000' },
     'kernel.pid_max'       => { 'value' => '4194303' },

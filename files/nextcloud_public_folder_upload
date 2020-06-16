@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+
+PUBSUFFIX="public.php/webdav"
+HEADER='X-Requested-With: XMLHttpRequest'
+
+if [ -z "$2" ];then
+  echo "$0 <filename> <public-share-url> <optional:share-password>"
+  exit 1
+fi
+
+FILENAME="$1"
+TARGET_FILENAME="$(basename $(echo "$1") )"
+FOLDERTOKEN="$(basename $(echo "$2") )"
+CLOUDURL="$( echo "$2"|sed '~s,/index.php.*$,,')"
+PASSWORD="$3"
+
+
+if ( ! [ -f "$FILENAME" ] );then
+   echo "ERROR: no such file -  $FILENAME"
+   exit 1
+fi
+
+if [ -z "$FOLDERTOKEN" ] || [ -z "$CLOUDURL" ];then
+  echo "ERROR: something is wrong with the uri -  $2"
+  exit 1
+fi
+
+
+RESULT="$(curl -T "$FILENAME" -u "$FOLDERTOKEN:$PASSWORD" -H "$HEADER" "$CLOUDURL/$PUBSUFFIX/$TARGET_FILENAME")"
+RET="$?" 
+
+if [ "$RET" = "0" ] && [ -z "$RESULT" ];then
+   echo "INFO: UPLOAD SUCCESSFUL"
+else
+   echo "INFO: UPLOAD FAILED, EXITCODE $RET"
+   echo "---"
+   echo "$RESULT"
+   echo "---"
+fi
+exit $RET

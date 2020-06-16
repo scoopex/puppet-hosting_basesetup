@@ -13,9 +13,19 @@ class hosting_basesetup::usermanagement (
   String $user_dotfile_default_sourcedir  = 'puppet:///modules/hosting_basesetup/dotfiles_default/',
   Integer $minimal_gid                    = 12000,
   Integer $minimal_uid                    = 12000,
+  Boolean $sudo_ssh_env_pass              = false,
 )
   {
 
+    if $sudo_ssh_env_pass {
+      file_line { 'ssh_env_pass':
+        ensure => present,
+        path   => '/etc/sudoers',
+        after  => 'Defaults\s+env_reset',
+        line   => 'Defaults env_keep += "SSH_CONNECTION SSH_AUTH_SOCK SSH_CLIENT SSH_TTY"',
+        match  => 'Defaults.*SSH_AUTH_SOCK.*'
+      }
+    }
     # Drop all files which are not managed by puppet
     file { '/etc/sudoers.d/':
       ensure  => 'directory',
@@ -65,6 +75,8 @@ class hosting_basesetup::usermanagement (
 
     $groups_final = deep_merge($groups, $groups_override)
     $users_final = deep_merge($users, $users_override)
+
+
 
     create_resources("hosting_basesetup::usermanagement::group", $groups_final)
     create_resources("hosting_basesetup::usermanagement::user", $users_final)

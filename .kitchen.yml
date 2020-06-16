@@ -15,6 +15,7 @@ provisioner:
   require_puppet_repo: false
   custom_options: '--show_diff'
   verify_host_key: false
+  hiera_config_path: "hiera-testing.yaml"
 
 transport:
   name: sftp

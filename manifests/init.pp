@@ -220,6 +220,7 @@ class hosting_basesetup (
   class { '::hosting_basesetup::lvm':
     snapshots => $lvm_snapshots,
   }
+  include ::hosting_basesetup::filesystems
 
   ## PROXY ###############################################################################
   include ::hosting_basesetup::proxy
@@ -241,5 +242,5 @@ class hosting_basesetup (
 
   ## CRON AND AT #########################################################################
   include ::hosting_basesetup::cron_at
-  include ::hosting_basesetup::filesystems
+
 }

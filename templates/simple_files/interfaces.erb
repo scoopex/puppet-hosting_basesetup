@@ -29,8 +29,8 @@ iface <%= get_var(interface, /.+\d+/) %> inet manual
 ###########################################################################
 # Bonding/LACP Interfaces
 
-auto bond0
-iface bond0 inet static
+auto bond0<% if @config['vlan_tag'] -%>.<%= @config['vlan_tag'] %><% end %>
+iface bond0<% if @config['vlan_tag'] -%>.<%= @config['vlan_tag'] %><% end %> inet static
    bond-mode 802.3ad
    bond-slaves none
    # fast lacp rate, every second

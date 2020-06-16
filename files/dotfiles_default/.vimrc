@@ -27,8 +27,10 @@ set showmatch
 " when inserting TABs replace them with the appropriate
 " number of spaces
 set expandtab
-set shiftwidth=3
-set tabstop=3
+set shiftwidth=2
+set tabstop=2
+set softtabstop=2
+
 "" C-style indenting
 set cindent
 set cinkeys-=0#

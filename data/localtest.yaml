@@ -6,6 +6,8 @@ hosting_basesetup::motd_announcement: |
   The world and the universe are far more wonderful if there's not a puppet master.
   Dave Matthews
 
+
+hosting_basesetup::usermanagement::sudo_ssh_env_pass: true
 hosting_basesetup::motd_documentation: https://github.com/scoopex/puppet-hosting_basesetup/
 
 hosting_basesetup::mail_root_recipient: admin@foobar.de
@@ -73,6 +75,10 @@ hosting_basesetup::zabbix_agent: true
 hosting_basesetup::monitoring::zabbix_agent::additional_agent_packages:
   - 'jq'
 
+hosting_basesetup::filesystems::federal_admin_reserve_banks:
+  "/":
+    size_mb: 12
+
 hosting_basesetup::usermanagement::restriction_tag: 'bigdata'
 hosting_basesetup::cron_at::manage_user_scheduled_jobs: true
 hosting_basesetup::unattended_upgrades: true
@@ -93,7 +99,9 @@ hosting_basesetup::groups:
   webdevhipsters:
     gid: 8002
     ensure: absent
-
+  j2ee-devs:
+    gid: 8003
+    ensure: defined
 
 # override default settings
 hosting_basesetup::users_override:
@@ -146,6 +154,15 @@ hosting_basesetup::users:
       - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCf8jizyqebUQ2hXJF5tWUz3eev+uE1liHZ7bMK4pp5nlaxkNq81dOLA9TZDbF6b+LFKKPxHUME5QypcDltaan83dN5tM+VJKz5K8qam9j8RpOm7gpKkomjXSTAMmhelZMLpOwhap77QVJo4EaKLqlkdRGh4o/dBnCOgkrZVjZ0TVG+u7BtGuQtbYvTBEL/Uu3HwWh4bGt5eFqyREgs6PE7u4bSnkyp6N/lrRqArefI0g2soNzOboxW2ONkAP6epNCRDDPp0erWJ1TU1VPLG72r2nupb7bdtTcDklGQMOWMWFvLzCkpD+LJDqh344gux1R45ikQqaL61ZqoV3Pt6t3xJ foo@bar.de"
     group_primary: 'devteam'
     ensure: present
+    dotfile_sourcedir: "no"
+  user5:
+    uid: 5005
+    fullname: Karl Napf5
+    mail: karl5l@napf.foobar.de
+    ssh_keys:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCf8jizyqebUQ2hXJF5tWUz3eev+uE1liHZ7bMK4pp5nlaxkNq81dOLA9TZDbF6b+LFKKPxHUME5QypcDltaan83dN5tM+VJKz5K8qam9j8RpOm7gpKkomjXSTAMmhelZMLpOwhap77QVJo4EaKLqlkdRGh4o/dBnCOgkrZVjZ0TVG+u7BtGuQtbYvTBEL/Uu3HwWh4bGt5eFqyREgs6PE7u4bSnkyp6N/lrRqArefI0g2soNzOboxW2ONkAP6epNCRDDPp0erWJ1TU1VPLG72r2nupb7bdtTcDklGQMOWMWFvLzCkpD+LJDqh344gux1R45ikQqaL61ZqoV3Pt6t3xJ foo@bar.de"
+    group_primary: 'devteam'
+    ensure: defined
     dotfile_sourcedir: "no"
 
 

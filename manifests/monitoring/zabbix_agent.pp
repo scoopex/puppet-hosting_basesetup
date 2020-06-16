@@ -28,10 +28,10 @@ class hosting_basesetup::monitoring::zabbix_agent (
       }
     )
     file { '/etc/sudoers.d/zabbix':
-      ensure => present,
-      mode   => '0440',
-      owner  => 'root',
-      group  => 'root',
+      ensure  => present,
+      mode    => '0440',
+      owner   => 'root',
+      group   => 'root',
       require => Package[$use_agent_extensions_pkgname],
     }
 
@@ -48,22 +48,33 @@ Include=/usr/share/zabbix-agent-extensions/include.d/
     }
   }
 
+  $zabbix_packages = ['zabbix-agent', 'zabbix-sender', 'zabbix-get']
   if $manage_repo {
     class { '::hosting_basesetup::monitoring::zabbix_repo':
       zabbix_version => $version,
-      before         => [ Package['zabbix-agent'], Package['zabbix-sender'], Package['zabbix-get'] ],
+    }
+    
+    case $facts['os']['family'] {
+      'Debian': {
+        package { $zabbix_packages:
+          ensure => $package_state,
+          require => [Class['::hosting_basesetup::monitoring::zabbix_repo'], Class['apt::update']],
+        }
+      }
+      'RedHat': {
+        package { $zabbix_packages:
+          ensure => $package_state,
+          require => Class['::hosting_basesetup::monitoring::zabbix_repo']
+        }
+      }
+      default: { notify { "The OS family ${facts['os']['family']} is not supported by this module": } }
+    }
+
+  }else {
+    package { $zabbix_packages:
+      ensure => $package_state,
     }
   }
-  package { "zabbix-agent":
-    ensure => $package_state,
-  }
-  package { 'zabbix-sender':
-    ensure => $package_state,
-  }
-  package { 'zabbix-get':
-    ensure => $package_state,
-  }
-
 
   file { "/etc/zabbix/zabbix_agentd.d":
     ensure  => directory,

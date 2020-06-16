@@ -60,16 +60,15 @@ def execute_cmd(cmd, dryrun=False):
         return process.returncode, out.decode('utf8'), err.decode('utf8')
 
 
-file_handle = None
-
+lock_file_handle = None
 
 def file_is_locked(file_path):
-    global file_handle
+    global lock_file_handle
 
     for i in range(1, 10):
-        file_handle = open(file_path, 'w')
+        lock_file_handle = open(file_path, 'w')
         try:
-            fcntl.lockf(file_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.lockf(lock_file_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
             return False
         except IOError:
             time.sleep(1)

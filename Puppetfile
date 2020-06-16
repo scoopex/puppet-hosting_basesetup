@@ -10,7 +10,7 @@ mod 'puppetlabs-stdlib', '>=4.24.0 <6.0.0'
 
 mod 'puppetlabs-ntp', '>=7.1.0'
 mod 'camptocamp-postfix', '>=1.6.0'
-mod 'puppetlabs-puppet_agent', '>=2.0.1'
+mod 'puppetlabs-puppet_agent', '>=2.0.1 <= 2.2.0'
 mod 'puppetlabs-lvm', '>=1.0.0'
 
 #mod 'puppet-unattended_upgrades', '>=3.2.0 <=3.2.1'
